@@ -1,0 +1,88 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+.backgroundcolorgreen {
+    background-color: #3fa21d;
+    border-radius: 50px 50px 50px 50px;
+    width: 30%;
+    height: 50%;
+}
+
+.backgroundcolorred {
+    background-color: #be1522;
+    border-radius: 50px 50px 50px 50px;
+    width: 30%;
+    height: 50%;
+}
+
+.backgroundcolorblue {
+    background-color: #4374b8;
+    border-radius: 50px 50px 50px 50px;
+    width: 30%;
+    height: 50%;
+}
+
+div .text-box {
+    background-color: white; /* White background */
+    border: 3px solid black; /* Black border */
+    border-radius: 45px 0 45px 0; /* Top-left and bottom-right rounded */
+    text-align: center; /* Center the text */
+    width: 250px;
+    height: 50px;
+}
+
+img{
+    width: 250px;
+    height: auto;
+}
+
+.radio-container {
+    display: flex;
+    flex-direction: column; /* Stack label above the radio buttons */
+    align-items: center; /* Center the content horizontally */
+    gap: 5px; /* Optional: Space between label and radio buttons */
+}
+
+.radio-center {
+    display: flex; /* Align radio buttons horizontally */
+    gap: 15px; /* Space between the radio button pairs */
+    justify-content: center; /* Center radio buttons within the container */
+}
+
+.radio-center label {
+    display: inline-flex; /* Align radio buttons and labels inline */
+    align-items: center; /* Vertically center the radio button with the label */
+}
+
+.radio-center input[type="radio"] {
+    margin-right: 5px; /* Space between radio button and label */
+}

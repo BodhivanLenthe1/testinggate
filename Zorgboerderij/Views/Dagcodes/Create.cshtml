@@ -1,0 +1,35 @@
+﻿@model Zorgboerderij.Entities.Dagcodes
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Dagcodes</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Dag" class="control-label"></label>
+                <input asp-for="Dag" class="form-control" />
+                <span asp-validation-for="Dag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DagCode" class="control-label"></label>
+                <input asp-for="DagCode" class="form-control" />
+                <span asp-validation-for="DagCode" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

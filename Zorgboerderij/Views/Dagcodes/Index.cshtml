@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Zorgboerderij.Entities.Dagcodes>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Beheer dagcodes</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Aanpassen
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DagCode)
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id"><img src="~/images/pencil-square.svg" style="width: 20px;"/></a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DagCode)
+                </td>
+                <td>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,35 @@
+﻿@if (Context.User.Identity.Name != null)
+{
+    <form asp-controller="Account" asp-action="Logout" method="post" id="LogoutForm" class="navbar">
+        <ul class="nav navbar-nav navbar-left float-end" style="margin-right: 80px; margin-top: 10px; display: flex; justify-content: space-around; align-items: center; padding: 0; list-style: none; width: 100%; flex-wrap: nowrap;">
+
+            @if (ViewContext.RouteData.Values["controller"].ToString() != "Home" || ViewContext.RouteData.Values["action"].ToString() != "Index")
+            {  
+                <li style="display: flex; flex-direction: column; align-items: center; margin-right: 40px;">
+                    <a href="javascript:history.back()" class="nav-link text-dark">
+                        <img src="@Url.Content("~/images/backward.png")" style="width: 25px;" />
+                    </a>
+                    <p class="text-center"><a class="text-decoration-none text-dark" href="javascript:history.back()">Back</a></p>
+                </li>
+
+                <li style="display: flex; flex-direction: column; align-items: center; margin-right: 40px;">
+                    <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">
+                        <img src="@Url.Content("~/images/house-fill.svg")" style="width: 25px;" />
+                    </a>
+                    <p class="text-center"><a class="text-decoration-none text-dark" asp-controller="Home" asp-action="Index">Home</a></p>
+                </li>
+            }
+
+            <li style="display: flex; flex-direction: column; align-items: center;">
+                <a class="nav-link text-dark" asp-controller="Account" asp-action="Logout">
+                    <img src="@Url.Content("~/images/logout.png")" style="width: 25px;" />
+                </a>
+                <p class="text-center"><a class="text-decoration-none text-dark" asp-controller="Account" asp-action="Logout">Logout</a></p>
+            </li>
+        </ul>
+    </form>
+}
+else
+{
+    // Optionally handle the case when the user is not logged in
+}

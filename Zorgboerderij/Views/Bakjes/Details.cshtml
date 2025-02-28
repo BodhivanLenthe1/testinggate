@@ -1,0 +1,31 @@
+﻿@model Zorgboerderij.Entities.Bakjes
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="d-flex justify-content-center">
+    <div class="col-md-4">
+        <form>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Foto" class="control-label"></label>
+                <input asp-for="Foto" class="form-control" readonly/>
+                <span asp-validation-for="Foto" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Titel" class="control-label"></label>
+                <input asp-for="Titel" class="form-control" readonly/>
+                <span asp-validation-for="Titel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Kleur" class="control-label"></label>
+                <input asp-for="Kleur" class="form-control" readonly />
+                <span asp-validation-for="Kleur" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <p class="text-center"><a href="javascript:history.back()" class="nav-link text-dark">Terug</a></p>
+            </div>
+        </form>
+    </div>
+</div>

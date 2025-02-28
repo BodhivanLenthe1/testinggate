@@ -1,0 +1,69 @@
+﻿@model IEnumerable<Zorgboerderij.Entities.Bezettingen>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Overzicht afmeldingen</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Client)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Maandag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dinsdag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Woensdag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Donderdag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Vrijdag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Zaterdag)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Totaal)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Maandag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dinsdag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Woensdag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Donderdag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Vrijdag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Zaterdag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Totaal)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

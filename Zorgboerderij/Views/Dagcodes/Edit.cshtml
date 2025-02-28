@@ -1,0 +1,31 @@
+﻿@model Zorgboerderij.Entities.Dagcodes
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h4 class="text-center">Dagcode Aanpassen</h4>
+<hr />
+<div class="d-flex justify-content-center">
+    <div class="col-md-5">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Dag" class="control-label"></label>
+                <input asp-for="Dag" class="form-control" readonly/>
+                <span asp-validation-for="Dag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DagCode" class="control-label"></label>
+                <input asp-for="DagCode" class="form-control" />
+                <span asp-validation-for="DagCode" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <input type="submit" value="Dagcode aanpassen" class="btn btn-primary w-100 mb-2" />
+                <p class="text-center"><a asp-action="Index" class="nav-link text-dark">Terug</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+

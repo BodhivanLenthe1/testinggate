@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Zorgboerderij.Entities.Bakjes>
+
+<div style="border: solid red 3px; width: 150px;border-radius: 10px;margin-bottom: 15px;">
+    <h2 class="text-center">
+        Corvee
+    </h2>
+</div>
+
+<p>
+    <a asp-action="Create" class="nav-link text-dark"><img src="~/images/imageadd.png" style="width: 20px; margin-left: 2px;" /><b> Afbeelding toevoegen</b></a>
+</p>
+
+<div class="personeel-container" style="display: flex; flex-wrap: wrap;">
+    @foreach (var bakje in Model)
+    {
+        <div style="margin: 10px; text-align: center;">
+            <img src="~/images/Personeel/@bakje.Foto" style="width: 225px; height: 125px;" />
+            <p style="word-wrap: break-word; margin: 0; max-width: 225px; overflow-wrap: break-word;">@bakje.Titel</p>
+
+            <a asp-action="Details" asp-route-id="@bakje.bid"><img src="~/images/information.png" style="width:25px;" /></a>
+            <a asp-action="Delete" asp-route-id="@bakje.bid"><img src="~/images/trash3-fill.svg" style="width:25px; margin-left: 10px;" /></a>
+        </div>
+    }
+</div>

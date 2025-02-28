@@ -1,0 +1,79 @@
+﻿@{
+    Layout = "_HomeLayout";
+}
+
+<div class="d-flex justify-content-center w-100">
+    <div class="d-flex flex-column align-items-center justify-content-center backgroundcolorgreen me-3">
+        <div>
+            <h1 class="p-4">BEHEER</h1>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="Personeel" asp-action="Index">Personeel</a>
+            </h4>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="Clienten" asp-action="Index">Clienten</a>
+            </h4>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">Dagindeling</h4>
+        </div>
+        <div>
+            <h4 class="p-1 mb-5 text-box">
+                <a class="nav-link text-dark" asp-controller="Bakjes" asp-action="Index">Bakjes</a>
+            </h4>
+        </div>
+    </div>
+
+    <div class="d-flex flex-column align-items-center justify-content-center backgroundcolorred me-3">
+        <div>
+            <h1 class="p-4">DAGKEUZE</h1>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">Maandag</h4>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">Dinsdag</h4>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">Woensdag</h4>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">Donderdag</h4>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">Vrijdag</h4>
+        </div>
+        <div>
+            <h4 class="p-1 mb-5 text-box">Zaterdag</h4>
+        </div>
+    </div>
+
+    <div class="d-flex flex-column align-items-center justify-content-center backgroundcolorblue">
+        <div>
+            <h1 class="p-4">INSTELLINGEN</h1>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="Toegang" asp-action="Index">Toegang</a>
+            </h4>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="Dagcodes" asp-action="Index">Dagcodes</a>
+            </h4>
+        </div>
+        <div>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="Bezettingen" asp-action="Index">Bezetting</a>
+            </h4>
+        </div>
+        <div>
+            <h4 class="p-1 mb-5 text-box">
+                <a class="nav-link text-dark" asp-controller="Afmeldingen" asp-action="Index">Afmeldingen</a>
+            </h4>
+        </div>
+    </div>
+</div>

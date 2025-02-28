@@ -1,0 +1,62 @@
+﻿@model Zorgboerderij.Models.RegistrationVM
+
+@{
+    ViewData["Title"] = "Registration";
+}
+
+<h1>Registration</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Registration">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="OrgId" class="control-label"></label>
+                <input asp-for="OrgId" class="form-control" />
+                <span asp-validation-for="OrgId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Voornaam" class="control-label"></label>
+                <input asp-for="Voornaam" class="form-control" />
+                <span asp-validation-for="Voornaam" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Achternaam" class="control-label"></label>
+                <input asp-for="Achternaam" class="form-control" />
+                <span asp-validation-for="Achternaam" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Gebruikersnaam" class="control-label"></label>
+                <input asp-for="Gebruikersnaam" class="form-control" />
+                <span asp-validation-for="Gebruikersnaam" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Wachtwoord" class="control-label"></label>
+                <input asp-for="Wachtwoord" class="form-control" />
+                <span asp-validation-for="Wachtwoord" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmWachtwoord" class="control-label"></label>
+                <input asp-for="ConfirmWachtwoord" class="form-control" />
+                <span asp-validation-for="ConfirmWachtwoord" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Register" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

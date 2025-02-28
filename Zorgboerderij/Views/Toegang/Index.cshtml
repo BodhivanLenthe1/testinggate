@@ -1,0 +1,66 @@
+﻿@model IEnumerable<Zorgboerderij.Entities.UserAccount>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<p>
+    <a asp-action="Create" class="nav-link text-dark"><img src="~/images/person-plus-fill.svg" style="width: 20px;" /><b> Nieuwe gebruiker toevoegen</b></a>
+</p>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Aanpassen
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrgId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Voornaam)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Achternaam)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Gebruikersnaam)
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id"><img src="~/images/pencil-square.svg" style="width: 20px;"/></a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id"><img src="~/images/trash3-fill.svg" style="width: 20px;" /></a>
+                </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrgId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Voornaam)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Achternaam)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Gebruikersnaam)
+            </td>
+            <td>
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

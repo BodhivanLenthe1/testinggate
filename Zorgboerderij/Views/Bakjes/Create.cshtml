@@ -1,0 +1,46 @@
+﻿@model Zorgboerderij.Entities.Bakjes
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="d-flex justify-content-center">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Foto" class="control-label"></label>
+                <input asp-for="Foto" class="form-control" type="file"/>
+                <span asp-validation-for="Foto" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Titel" class="control-label"></label>
+                <input asp-for="Titel" class="form-control" />
+                <span asp-validation-for="Titel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Kleur" class="control-label"></label>
+                <select class="form-select" asp-for="Kleur">
+                    <option value="Blauw">Dieren</option>
+                    <option value="Paars">Verzorgen</option>
+                    <option value="Groen">Tuin</option>
+                    <option value="Oranje">Land</option>
+                    <option value="Roze">Tijden</option>
+                    <option value="Geel">Corvee</option>
+                    <option value="Rood">Creatief</option>
+                    <option value="Grijs">Schuur</option>
+                    <option value="Zwart">Klussen</option>
+                </select>
+                <span asp-validation-for="Kleur" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <input type="submit" value="Create" class="btn btn-primary w-100 mb-2" />
+                <p class="text-center"><a href="javascript:history.back()" class="nav-link text-dark">Terug</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

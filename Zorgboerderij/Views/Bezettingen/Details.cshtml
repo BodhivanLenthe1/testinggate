@@ -1,0 +1,66 @@
+﻿@model Zorgboerderij.Entities.Bezettingen
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Bezettingen</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Client)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Client)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Maandag)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Maandag)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Dinsdag)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Dinsdag)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Woensdag)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Woensdag)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Donderdag)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Donderdag)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Vrijdag)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Vrijdag)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Zaterdag)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Zaterdag)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Totaal)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Totaal)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

@@ -1,0 +1,130 @@
+﻿@model Zorgboerderij.Entities.Personeel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="d-flex justify-content-center">
+    <div class="col-md-5">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="persid" />
+            <div class="form-group">
+                <label asp-for="Voornaam" class="control-label"></label>
+                <input asp-for="Voornaam" class="form-control" />
+                <span asp-validation-for="Voornaam" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Achternaam" class="control-label"></label>
+                <input asp-for="Achternaam" class="form-control" />
+                <span asp-validation-for="Achternaam" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FotoFile" class="control-label"></label>
+                <select class="form-select" asp-for="FotoFile">
+                    <option value="Davy.jpg">Davy.jpg</option>
+                    <option value="Jan.jpg">Jan.jpg</option>
+                </select>
+                <span asp-validation-for="FotoFile" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Maandag" class="control-label"></label>
+                <div>
+                    <label>
+                        <input asp-for="Maandag" type="radio" value="1" /> Aanwezig
+                    </label>
+                    <label>
+                        <input asp-for="Maandag" type="radio" value="0" /> Afwezig
+                    </label>
+                </div>
+                <span asp-validation-for="Maandag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Dinsdag" class="control-label"></label>
+                <div>
+                    <label>
+                        <input asp-for="Dinsdag" type="radio" value="1" /> Aanwezig
+                    </label>
+                    <label>
+                        <input asp-for="Dinsdag" type="radio" value="0" /> Afwezig
+                    </label>
+                </div>
+                <span asp-validation-for="Dinsdag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Woensdag" class="control-label"></label>
+                <div>
+                    <label>
+                        <input asp-for="Woensdag" type="radio" value="1" /> Aanwezig
+                    </label>
+                    <label>
+                        <input asp-for="Woensdag" type="radio" value="0" /> Afwezig
+                    </label>
+                </div>
+                <span asp-validation-for="Woensdag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Donderdag" class="control-label"></label>
+                <div>
+                    <label>
+                        <input asp-for="Donderdag" type="radio" value="1" /> Aanwezig
+                    </label>
+                    <label>
+                        <input asp-for="Donderdag" type="radio" value="0" /> Afwezig
+                    </label>
+                </div>
+                <span asp-validation-for="Donderdag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Vrijdag" class="control-label"></label>
+                <div>
+                    <label>
+                        <input asp-for="Vrijdag" type="radio" value="1" /> Aanwezig
+                    </label>
+                    <label>
+                        <input asp-for="Vrijdag" type="radio" value="0" /> Afwezig
+                    </label>
+                </div>
+                <span asp-validation-for="Vrijdag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Zaterdag" class="control-label"></label>
+                <div>
+                    <label>
+                        <input asp-for="Zaterdag" type="radio" value="1" /> Aanwezig
+                    </label>
+                    <label>
+                        <input asp-for="Zaterdag" type="radio" value="0" /> Afwezig
+                    </label>
+                </div>
+                <span asp-validation-for="Zaterdag" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Afwezig" class="control-label"></label>
+                <select class="form-select" asp-for="Afwezig">
+                    <option value="0">Aanwezig</option>
+                    <option value="1">Tandarts</option>
+                    <option value="2">Vakantie</option>
+                    <option value="3">Verjaardag</option>
+                    <option value="4">Ziek</option>
+                    <option value="5">Vrij</option>
+                    <option value="6">Dokter</option>
+                </select>
+                <span asp-validation-for="Afwezig" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Goepskleur" class="control-label"></label>
+                <select class="form-select" asp-for="Goepskleur">
+                    <option value="0">Geel</option>
+                    <option value="1">Blauw</option>
+                    <option value="2">Groen</option>
+                </select>
+                <span asp-validation-for="Goepskleur" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <input type="submit" value="Collega bewerken" class="btn btn-primary w-100 mb-2" />
+                <p class="text-center"><a asp-action="Index" class="nav-link text-dark">Terug</a></p>
+            </div>
+        </form>
+    </div>
+</div>
