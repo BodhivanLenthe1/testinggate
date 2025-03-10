@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using System.Security.Claims;
 using Zorgboerderij.Entities;
 using Zorgboerderij.Models;
+using BCrypt.Net;
+
 
 namespace Zorgboerderij.Controllers
 {
@@ -37,7 +39,7 @@ namespace Zorgboerderij.Controllers
                 account.Achternaam = model.Achternaam;
                 account.Email = model.Email;
                 account.Gebruikersnaam = model.Gebruikersnaam;
-                account.Wachtwoord = model.Wachtwoord;
+                account.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(model.Wachtwoord);
 
                 try
                 {
@@ -64,18 +66,23 @@ namespace Zorgboerderij.Controllers
         [HttpPost]
         public IActionResult Login(LoginVM model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var user = _context.userAccounts.Where(x => x.OrgId == model.OrgId && x.Gebruikersnaam == model.Gebruikersnaam && x.Wachtwoord == model.Wachtwoord).FirstOrDefault();
-                if(user != null)
+                // Zoek de gebruiker op basis van gebruikersnaam en OrgId (zonder wachtwoordvergelijking)
+                var user = _context.userAccounts
+                    .Where(x => x.OrgId == model.OrgId && x.Gebruikersnaam == model.Gebruikersnaam)
+                    .FirstOrDefault();
+
+                // Controleer of gebruiker bestaat en wachtwoord correct is met BCrypt
+                if (user != null && BCrypt.Net.BCrypt.Verify(model.Wachtwoord, user.Wachtwoord))
                 {
                     // Success, Cookie maken
                     var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.Email),
-                        new Claim("Name", user.Voornaam),
-                        new Claim(ClaimTypes.Role, "User"),
-                    };
+            {
+                new Claim(ClaimTypes.Name, user.Email),
+                new Claim("Name", user.Voornaam),
+                new Claim(ClaimTypes.Role, "User"),
+            };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
