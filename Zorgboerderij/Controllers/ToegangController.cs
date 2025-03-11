@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Zorgboerderij.Entities;
 
+// passwords all accounts exept bodhis/qutaibas = Test123!
+
 namespace Zorgboerderij.Controllers
 {
     public class ToegangController : Controller
@@ -70,6 +72,9 @@ namespace Zorgboerderij.Controllers
 
             if (ModelState.IsValid)
             {
+                // Wachtwoord hashen met BCrypt
+                userAccount.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(userAccount.Wachtwoord);
+
                 _context.Add(userAccount);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -77,6 +82,7 @@ namespace Zorgboerderij.Controllers
 
             return View(userAccount);
         }
+
 
         [Authorize]
         // GET: Instellingen/Edit/5
@@ -108,27 +114,39 @@ namespace Zorgboerderij.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Zoek de bestaande entiteit
+            var existingUser = await _context.userAccounts.FindAsync(id);
+            if (existingUser == null)
             {
-                try
-                {
-                    _context.Update(userAccount);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UserAccountExists(userAccount.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            return View(userAccount);
+
+            // Als het wachtwoord gewijzigd is, moet het opnieuw worden gehasht
+            if (existingUser.Wachtwoord != userAccount.Wachtwoord)
+            {
+                userAccount.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(userAccount.Wachtwoord);
+            }
+
+            // Markeer de bestaande entiteit als gewijzigd
+            _context.Entry(existingUser).CurrentValues.SetValues(userAccount);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserAccountExists(userAccount.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         [Authorize]
