@@ -18,13 +18,14 @@ namespace Zorgboerderij.Controllers
             _context = context;
         }
 
-        // GET: Clienten
+        
         public async Task<IActionResult> Index()
         {
             return View(await _context.clienten.ToListAsync());
         }
 
-        // GET: Clienten/Details/5
+
+      
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,7 +34,7 @@ namespace Zorgboerderij.Controllers
             }
 
             var clienten = await _context.clienten
-                .FirstOrDefaultAsync(m => m.persid == id);
+                .FirstOrDefaultAsync(m => m.persid == id);  
             if (clienten == null)
             {
                 return NotFound();
@@ -42,15 +43,12 @@ namespace Zorgboerderij.Controllers
             return View(clienten);
         }
 
-        // GET: Clienten/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Clienten/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Afwezig,Goepskleur")] Clienten clienten)
@@ -64,7 +62,7 @@ namespace Zorgboerderij.Controllers
             return View(clienten);
         }
 
-        // GET: Clienten/Edit/5
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -77,17 +75,17 @@ namespace Zorgboerderij.Controllers
             {
                 return NotFound();
             }
+
             return View(clienten);
         }
 
-        // POST: Clienten/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Afwezig,Goepskleur")] Clienten clienten)
         {
-            if (id != clienten.persid)
+            if (id != clienten.persid)  
             {
                 return NotFound();
             }
@@ -101,7 +99,7 @@ namespace Zorgboerderij.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClientenExists(clienten.persid))
+                    if (!ClientenExists(clienten.persid)) 
                     {
                         return NotFound();
                     }
@@ -124,8 +122,7 @@ namespace Zorgboerderij.Controllers
             }
 
             var clienten = await _context.clienten
-                .FirstOrDefaultAsync(m => m.persid == id);
-            if (clienten == null)
+                .FirstOrDefaultAsync(m => m.persid == id);  
             {
                 return NotFound();
             }
@@ -133,7 +130,7 @@ namespace Zorgboerderij.Controllers
             return View(clienten);
         }
 
-        // POST: Clienten/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -150,7 +147,7 @@ namespace Zorgboerderij.Controllers
 
         private bool ClientenExists(int id)
         {
-            return _context.clienten.Any(e => e.persid == id);
+            return _context.clienten.Any(e => e.persid == id);  
         }
     }
 }

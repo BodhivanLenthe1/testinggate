@@ -5,40 +5,123 @@
 }
 
 <p>
-<p>
-    <a asp-action="Create" class="nav-link text-dark"><img src="~/images/person-plus-fill.svg" style="width: 20px;" /><b> Nieuw client toevoegen</b></a>
+    <a asp-action="Create" class="nav-link text-dark"
+       style="padding: 12px 20px; background-color: #4CAF50; color: white; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center;">
+        <img src="~/images/person-plus-fill.svg" style="width: 20px; margin-right: 10px;" />
+        <b>Nieuw client toevoegen</b>
+    </a>
 </p>
 
-<div class="personeel-container" style="display: flex; flex-wrap: wrap;">
-        @foreach (var client in Model)
-        {
-        <div style="margin: 10px; text-align: center;">
-            <img src="~/images/Personeel/@client.FotoFile" style="width: 225px; height: 125px;" />
-            <h3 class="">@client.Voornaam @client.Achternaam</h3>
+<div style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; margin-top: 20px;">
+    @foreach (var client in Model)
+    {
+        <div style="width: 300px; border: 1px solid #8a4637; border-radius: 12px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); padding: 15px; text-align: center; background-color: #F0E68C">
+            <div>
+                <img src="~/images/Personeel/@client.FotoFile" alt="@client.Voornaam @client.Achternaam"
+                     style="width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px;" />
+            </div>
+            <h3 style="color: #333; font-size: 20px; font-weight: bold;">@client.Voornaam @client.Achternaam</h3>
 
-            <a asp-action="Edit" asp-route-id="@client.persid"><img src="~/images/pencil-square.svg" style="width:25px; margin-bottom: 10px;" /></a>
-            <a asp-action="Delete" asp-route-id="@client.persid"><img src="~/images/trash3-fill.svg" style="width:25px; margin-bottom: 10px;" /></a>
+            <div style="margin-top: 10px;">
+                <a asp-action="Edit" asp-route-id="@client.persid"
+                   style="background-color: #007bff; color: white; padding: 8px 15px; border-radius: 5px; font-size: 14px; text-decoration: none; margin: 5px;">
+                    <img src="~/images/pencil-square.svg" style="width: 20px;" />
+                    Bewerken
+                </a>
+                <a asp-action="Delete" asp-route-id="@client.persid"
+                   style="background-color: #dc3545; color: white; padding: 8px 15px; border-radius: 5px; font-size: 14px; text-decoration: none; margin: 5px;">
+                    <img src="~/images/trash3-fill.svg" style="width: 20px;" />
+                    Verwijderen
+                </a>
+            </div>
 
-            <table class="table table-bordered">
-                <thead>
-                <th>Ma</th>
-                <th>Di</th>
-                <th>Wo</th>
-                <th>Do</th>
-                <th>Vr</th>
-                <th>Za</th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>@(client.Maandag == 1 ? "X" : "-")</td>
-                        <td>@(client.Dinsdag == 1 ? "X" : "-")</td>
-                        <td>@(client.Woensdag == 1 ? "X" : "-")</td>
-                        <td>@(client.Donderdag == 1 ? "X" : "-")</td>
-                        <td>@(client.Vrijdag == 1 ? "X" : "-")</td>
-                        <td>@(client.Zaterdag == 1 ? "X" : "-")</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div style="overflow-x: auto; margin-top: 20px;">
+                <table style="width: 200%; min-width: 800px; border-collapse: collapse; border: 1px solid #ddd;">
+                    <thead>
+                        <tr style="background-color: #4CAF50; color: white;">
+                            <th style="padding: 10px; text-align: center;">Ma</th>
+                            <th style="padding: 10px; text-align: center;">Di</th>
+                            <th style="padding: 10px; text-align: center;">Wo</th>
+                            <th style="padding: 10px; text-align: center;">Do</th>
+                            <th style="padding: 10px; text-align: center;">Vr</th>
+                            <th style="padding: 10px; text-align: center;">Za</th>
+                            <th style="padding: 10px; text-align: center;">Groepskleur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            @foreach (var dag in new[] { "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag" })
+                            {
+                                var dagwaarde = client.GetType().GetProperty(dag).GetValue(client).ToString();
+                                var achtergrondkleur = dagwaarde switch
+                                {
+                                    "O" => "#64B5F6",  // Blue (Ochtend)
+                                    "M" => "#FFEB3B",  // Yellow (Middag)
+                                    "H" => "#81C784",  // Green (Hele dag)
+                                    _ => "#f5f5f5"      // Gray (Afwezig)
+                                };
+
+                                <td style="padding: 15px; text-align: center; background-color: @achtergrondkleur; border: 1px solid #ddd; font-weight: bold; font-size: 14px;">
+                                    @if (dagwaarde == "O")
+                                    {
+                                        @:Ochtend 🌅
+                                    }
+                                    else if (dagwaarde == "M")
+                                    {
+                                        @:Middag 🌞
+                                    }
+                                    else if (dagwaarde == "H")
+                                    {
+                                        @:Hele dag 😎
+                                    }
+                                    else
+                                    {
+                                        @:X 🛑
+                                    }
+                                </td>
+                            }
+
+                            
+
+                            <td style="padding: 15px; text-align: center; border: 1px solid #ddd; font-weight: bold; font-size: 14px;
+           background-color:
+                @switch (client.Goepskleur)
+                {
+                    case "Geel":
+                        @: #FFEB3B;  /* Yellow */
+                        break;
+                    case "Rood":
+                        @: #FF5733;  /* Red */
+                        break;
+                    case "Blauw":
+                        @: #2196F3;  /* Blue */
+                        break;
+                    default:
+                        @: #f5f5f5;  /* Default color (gray if unknown) */
+                        break;
+                }
+               ">
+                                @switch (client.Goepskleur)
+                                {
+                                    case "Geel":
+                                        @:Geel
+                                        break;
+                                    case "Rood":
+                                        @:Rood
+                                        break;
+                                    case "Blauw":
+                                        @:Blauw
+                                        break;
+                                    default:
+                                        @:Onbekend
+                                        break;
+                                }
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        }
+    }
 </div>
