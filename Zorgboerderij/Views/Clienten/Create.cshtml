@@ -7,178 +7,112 @@
 <div class="d-flex justify-content-center">
     <div class="col-md-5">
         <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Voornaam" class="control-label"></label>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Voornaam" class="control-label text-primary"></label>
                 <input asp-for="Voornaam" class="form-control" />
                 <span asp-validation-for="Voornaam" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Achternaam" class="control-label"></label>
+
+            <div class="form-group mb-3">
+                <label asp-for="Achternaam" class="control-label text-primary"></label>
                 <input asp-for="Achternaam" class="form-control" />
                 <span asp-validation-for="Achternaam" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="FotoFile" class="control-label"></label>
+
+            <div class="form-group mb-3">
+                <label asp-for="FotoFile" class="control-label text-primary"></label>
                 <select class="form-select" asp-for="FotoFile">
-                    <option value="Adrienne.jpg">Adrienne</option>
-                    <option value="Allard.jpg">Allard</option>
-                    <option value="Aschwin.jpg">Aschwin</option>
-                    <option value="Ashley.jpg">Ashley</option>
-                    <option value="Chiara.jpg">Chiara</option>
-                    <option value="Daniel.jpg">Daniel</option>
-                    <option value="Dean.jpg">Dean</option>
-                    <option value="Delano van Eldik.jpg">Delano</option>
-                    <option value="Dennis.jpg">Dennis</option>
-                    <option value="Dewi.jpg">Dewi</option>
-                    <option value="Elianne.jpg">Elianne</option>
+                    <option value="Davy.jpg">Davy</option>
                     <option value="Eric S.jpg">Eric</option>
-                    <option value="Erik.jpg">Erik</option>
-                    <option value="Erisca.jpg">Erisca</option>
-                    <option value="Femke.jpg">Femke</option>
-                    <option value="Frans.jpg">Frans</option>
-                    <option value="Freek.jpg">Freek</option>
-                    <option value="Gijs.jpg">Gijs</option>
-                    <option value="Guus.jpg">Guus</option>
-                    <option value="Inge.jpg">Inge</option>
-                    <option value="Jeanet.jpg">Jeanet</option>
-                    <option value="Jordi.jpg">Jordi</option>
-                    <option value="Julie.jpg">Julie</option>
-                    <option value="Kendall.jpg">Kendall</option>
-                    <option value="Koen.jpg">Koen</option>
-                    <option value="Kyan.jpg">Kyan</option>
-                    <option value="Lars.jpg">Lars</option>
-                    <option value="Luna.jpg">Luna</option>
-                    <option value="Manon.jpg">Manon</option>
-                    <option value="Mark.jpg">Mark</option>
-                    <option value="Marloes.jpg">Marloes</option>
-                    <option value="Marriëtte.jpg">Marriëtte</option>
-                    <option value="Marscha.jpg">Marscha</option>
-                    <option value="Mascha.jpg">Mascha</option>
-                    <option value="Nienke.jpg">Nienke</option>
-                    <option value="Paul.jpg">Paul</option>
-                    <option value="Quenten B.jpg">Quenten</option>
-                    <option value="Quincy.jpg">Quincy</option>
-                    <option value="Rene Derksen Ziep.jpg">Rene</option>
-                    <option value="Rick F.jpg">Rick F</option>
-                    <option value="Rick R.jpg">Rick R</option>
-                    <option value="Robin J.jpg">Robin J</option>
-                    <option value="Robin M.jpg">Robin M</option>
-                    <option value="Rick F.jpg">Rick F</option>
-                    <option value="Sander.jpg">Sander</option>
-                    <option value="Sarah.jpg">Sarah</option>
-                    <option value="Sinead.jpg">Sinead</option>
-                    <option value="Stan.jpg">Stan</option>
-                    <option value="Thijs.jpg">Thijs</option>
-                    <option value="Tonnie.jpg">Tonnie</option>
-                    <option value="Viola.jpg">Viola</option>
                     <option value="Walter.jpg">Walter</option>
-                    <option value="Wilco H.jpg">Wilco H</option>
-                    <option value="Wilco.jpg">Wilco</option>
-                    <option value="Wim.jpg">Wim</option>
+                    <option value="Qutaiba.jpg">Qutaiba</option>
                 </select>
                 <span asp-validation-for="FotoFile" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="Maandag" class="control-label"></label>
-                <div>
-                    <label>
-                        <input asp-for="Maandag" type="radio" value="1" /> Aanwezig
-                    </label>
-                    <label>
-                        <input asp-for="Maandag" type="radio" value="0" /> Afwezig
-                    </label>
-                </div>
-                <span asp-validation-for="Maandag" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Dinsdag" class="control-label"></label>
-                <div>
-                    <label>
-                        <input asp-for="Dinsdag" type="radio" value="1" /> Aanwezig
-                    </label>
-                    <label>
-                        <input asp-for="Dinsdag" type="radio" value="0" /> Afwezig
-                    </label>
-                </div>
-                <span asp-validation-for="Dinsdag" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Woensdag" class="control-label"></label>
-                <div>
-                    <label>
-                        <input asp-for="Woensdag" type="radio" value="1" /> Aanwezig
-                    </label>
-                    <label>
-                        <input asp-for="Woensdag" type="radio" value="0" /> Afwezig
-                    </label>
-                </div>
-                <span asp-validation-for="Woensdag" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Donderdag" class="control-label"></label>
-                <div>
-                    <label>
-                        <input asp-for="Donderdag" type="radio" value="1" /> Aanwezig
-                    </label>
-                    <label>
-                        <input asp-for="Donderdag" type="radio" value="0" /> Afwezig
-                    </label>
-                </div>
-                <span asp-validation-for="Donderdag" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Vrijdag" class="control-label"></label>
-                <div>
-                    <label>
-                        <input asp-for="Vrijdag" type="radio" value="1" /> Aanwezig
-                    </label>
-                    <label>
-                        <input asp-for="Vrijdag" type="radio" value="0" /> Afwezig
-                    </label>
-                </div>
-                <span asp-validation-for="Vrijdag" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Zaterdag" class="control-label"></label>
-                <div>
-                    <label>
-                        <input asp-for="Zaterdag" type="radio" value="1" /> Aanwezig
-                    </label>
-                    <label>
-                        <input asp-for="Zaterdag" type="radio" value="0" /> Afwezig
-                    </label>
-                </div>
-                <span asp-validation-for="Zaterdag" class="text-danger"></span>
-            </div>
+            @foreach (var dag in new[] { "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag" })
+            {
+                <div class="form-group mb-3">
+                    <label asp-for="@dag" class="control-label text-primary">@dag</label>
+                    <div>
+                        <label class="text-success">
+                            <input type="radio" name="@dag-Status" value="1" onclick="toggleTimeOptions('@dag', true)" /> Aanwezig
+                        </label>
+                        <label class="text-danger">
+                            <input type="radio" name="@dag-Status" value="0" onclick="toggleTimeOptions('@dag', false)" /> Afwezig
+                        </label>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="Afwezig" class="control-label"></label>
-                <select class="form-select" asp-for="Afwezig">
-                    <option value="0">Aanwezig</option>
-                    <option value="1">Tandarts</option>
-                    <option value="2">Vakantie</option>
-                    <option value="3">Verjaardag</option>
-                    <option value="4">Ziek</option>
-                    <option value="5">Vrij</option>
-                    <option value="6">Dokter</option>
-                </select>
-                <span asp-validation-for="Afwezig" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Goepskleur" class="control-label"></label>
+                    <div id="@dag-TimeOptions" class="time-options mt-2" style="display: none;">
+                        <label class="text-primary">Keuze tijd</label><br />
+                        <label>
+                            <input type="radio" name="@dag-Time" value="Ochtend" /> Ochtend
+                        </label>
+                        <label>
+                            <input type="radio" name="@dag-Time" value="Middag" /> Middag
+                        </label>
+                        <label>
+                            <input type="radio" name="@dag-Time" value="Hele dag" /> Hele dag
+                        </label>
+                    </div>
+
+                    <span asp-validation-for="@dag" class="text-danger"></span>
+                </div>
+            }
+
+           
+            <div class="form-group mb-3">
+                <label asp-for="Goepskleur" class="control-label text-primary"></label>
                 <select class="form-select" asp-for="Goepskleur">
-                    <option value="1">Rood</option>
-                    <option value="2">Blauw</option>
+                    <option value="Geel">Geel</option>
+                    <option value="Rood">Rood</option>
+                    <option value="Blauw">Blauw</option>
                 </select>
                 <span asp-validation-for="Goepskleur" class="text-danger"></span>
             </div>
-            <div class="form-group mt-2">
-                <input type="submit" value="Collega aanmaken" class="btn btn-primary w-100 mb-2" />
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Collega aanmaken" class="btn btn-success w-100 mb-2" />
                 <p class="text-center"><a asp-action="Index" class="nav-link text-dark">Terug</a></p>
             </div>
         </form>
     </div>
-
 </div>
+
+<script>
+    // Functie om de tijdopties te tonen/verbergen
+    function toggleTimeOptions(day, isPresent) {
+        // Verberg eerst alle tijdopties
+        var timeOptions = document.querySelectorAll('.time-options');
+        timeOptions.forEach(function (option) {
+            option.style.display = 'none';
+        });
+
+        // Als de dag "Aanwezig" is, toon de tijdopties
+        if (isPresent) {
+            var selectedDay = document.getElementById(day + '-TimeOptions');
+            if (selectedDay) {
+                selectedDay.style.display = 'block';
+            }
+        } else {
+            var selectedDay = document.getElementById(day + '-TimeOptions');
+            if (selectedDay) {
+                selectedDay.style.display = 'none';
+            }
+        }
+
+        // Reset de radio knoppen voor de andere status (om ervoor te zorgen dat de knoppen niet vast blijven staan)
+        var radios = document.querySelectorAll(`input[name='${day}-Status']`);
+        radios.forEach(function (radio) {
+            radio.checked = false;
+        });
+        // Markeer de geselecteerde knop
+        var selectedRadio = document.querySelector(`input[name='${day}-Status'][value='${isPresent ? '1' : '0'}']`);
+        if (selectedRadio) {
+            selectedRadio.checked = true;
+        }
+    }
+
+</script>
