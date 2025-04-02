@@ -1,0 +1,87 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    @model IEnumerable<Zorgboerderij.Entities.Clienten>
+
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dagindeling van Cliënten</title>
+</head>
+
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 20px;">
+    <div style="text-align: center; margin-top: 20px; font-size: 24px; font-weight: bold;">
+        Dagindeling van Cliënten
+    </div>
+
+    <div style="display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+        @foreach (var client in Model)
+        {
+            <div style="flex: 1; border: 1px solid #ddd; padding: 10px; background-color: white; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); text-align: center;">
+                <div style="font-size: 16px; font-weight: bold; color: #fff; background-color: #DD6E6E; padding: 5px 10px; border-radius: 5px; margin-bottom: 10px; text-align: center; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);">
+                    @client.Voornaam @client.Achternaam
+                </div>
+
+                <img src="~/images/Personeel/@client.FotoFile" alt="@client.Voornaam @client.Achternaam" style="width: 100px; height: 100px; margin: 0 auto 10px; border: 2px solid #ddd;">
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th style="padding: 10px; text-align: center; border: 1px solid #ddd; background-color: #4CAF50; color: white;">Ma</th>
+                            <th style="padding: 10px; text-align: center; border: 1px solid #ddd; background-color: #4CAF50; color: white;">Di</th>
+                            <th style="padding: 10px; text-align: center; border: 1px solid #ddd; background-color: #4CAF50; color: white;">Wo</th>
+                            <th style="padding: 10px; text-align: center; border: 1px solid #ddd; background-color: #4CAF50; color: white;">Do</th>
+                            <th style="padding: 10px; text-align: center; border: 1px solid #ddd; background-color: #4CAF50; color: white;">Vr</th>
+                            <th style="padding: 10px; text-align: center; border: 1px solid #ddd; background-color: #4CAF50; color: white;">Za</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            @foreach (var dag in new[] { "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag" })
+                            {
+                                var dagwaarde = client.GetType().GetProperty(dag)?.GetValue(client).ToString();
+                                var achtergrondkleur = dagwaarde switch
+                                {
+                                    "O" => "#64B5F6", // Blue (Ochtend)
+                                    "M" => "#FFEB3B", // Yellow (Middag)
+                                    "H" => "#81C784", // Green (Hele dag)
+                                    _ => "#f5f5f5" // Gray (Afwezig)
+                                };
+
+                                <td style="background-color: @achtergrondkleur; font-weight: bold; font-size: 14px; padding: 10px; text-align: center; border: 1px solid #ddd;">
+                                    @if (dagwaarde == "O")
+                                    {
+                                        @:Ochtend 🌅
+                                    }
+                                    else if (dagwaarde == "M")
+                                    {
+                                        @:Middag 🌞
+                                    }
+                                    else if (dagwaarde == "H")
+                                    {
+                                        @:Hele dag 😎
+                                    }
+                                    else
+                                    {
+                                        @:X 🛑
+                                    }
+                                </td>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+                <button style="margin-top: 10px; padding: 10px 15px; color: white; background-color: #4CAF50; border: none; border-radius: 5px; cursor: pointer; display: block; text-align: center;">
+                    Dagprogramma aanpassen
+                </button>
+            </div>
+        }
+    </div>
+</body>
+
+</html>
+
+}

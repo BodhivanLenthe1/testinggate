@@ -18,7 +18,9 @@
             </h4>
         </div>
         <div>
-            <h4 class="p-1 text-box">Dagindeling</h4>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="dagindeling" asp-action="dagindeling">Dagindeling</a>
+            </h4>
         </div>
         <div>
             <h4 class="p-1 mb-5 text-box">
@@ -32,25 +34,36 @@
             <h1 class="p-4">DAGKEUZE</h1>
         </div>
         <div>
-            <h4 class="p-1 text-box">Maandag</h4>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="dagplanning" asp-action="dagkeuze" asp-route-dag="Maandag">Maandag</a>
+            </h4>
         </div>
         <div>
-            <h4 class="p-1 text-box">Dinsdag</h4>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="dagplanning" asp-action="dagkeuze" asp-route-dag="Dinsdag">Dinsdag</a>
+            </h4>
         </div>
         <div>
-            <h4 class="p-1 text-box">Woensdag</h4>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="dagplanning" asp-action="dagkeuze" asp-route-dag="Woensdag">Woensdag</a>
+            </h4>
         </div>
         <div>
-            <h4 class="p-1 text-box">Donderdag</h4>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="dagplanning" asp-action="dagkeuze" asp-route-dag="Donderdag">Donderdag</a>
+            </h4>
         </div>
         <div>
-            <h4 class="p-1 text-box">Vrijdag</h4>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="dagplanning" asp-action="dagkeuze" asp-route-dag="Vrijdag">Vrijdag</a>
+            </h4>
         </div>
         <div>
-            <h4 class="p-1 mb-5 text-box">Zaterdag</h4>
+            <h4 class="p-1 text-box">
+                <a class="nav-link text-dark" asp-controller="dagplanning" asp-action="dagkeuze" asp-route-dag="Zaterdag">Zaterdag</a>
+            </h4>
         </div>
     </div>
-
     <div class="d-flex flex-column align-items-center justify-content-center backgroundcolorblue">
         <div>
             <h1 class="p-4">INSTELLINGEN</h1>
@@ -71,8 +84,13 @@
             </h4>
         </div>
         <div>
-            <h4 class="p-1 mb-5 text-box">
+            <h4 class="p-1 text-box">
                 <a class="nav-link text-dark" asp-controller="Afmeldingen" asp-action="Index">Afmeldingen</a>
+            </h4>
+        </div>
+        <div>
+            <h4 class="p-1 mb-5 text-box">
+                <a class="nav-link text-dark" asp-controller="Aanpasbaar" asp-action="Index">Aanpasbaarheid</a>
             </h4>
         </div>
     </div>
