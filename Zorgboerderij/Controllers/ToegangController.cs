@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Zorgboerderij.Entities;
 
-// passwords all accounts exept bodhis/qutaibas = Test123!
+// passwords all accounts except bodhis/qutaibas = Test123!
 
 namespace Zorgboerderij.Controllers
 {
