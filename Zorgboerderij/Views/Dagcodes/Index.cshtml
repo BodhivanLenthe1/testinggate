@@ -1,43 +1,46 @@
 ﻿@model IEnumerable<Zorgboerderij.Entities.Dagcodes>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Dagcodes";
 }
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Beheer dagcodes</h1>
+</div>
 
-<h1>Beheer dagcodes</h1>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Aanpassen
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Dag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DagCode)
-            </th>
-            <th>
+<ul class="list-group mt-4">
+    @foreach (var item in Model)
+    {
+        <li class="list-group-item" style="border-radius: 16px; border-bottom: groove;">
+            <div class="d-flex justify-content-between align-items-center dagcode-row p-3"
+                 onclick="toggleDetails('@item.Id', 'dagcode-details', 'dagcodeDetails-')"
+                 style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 me-3" style="font-weight: 600;">@item.Dag</h5>
+                </div>
+                <div onclick="event.stopPropagation();">
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm">
+                        <img src="~/images/pencil-square.svg" style="width: 18px;" />
+                    </a>
+                </div>
+            </div>
+            <div id="dagcodeDetails-@item.Id" class="dagcode-details mt-3" style="display: none; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.5s ease, opacity 0.4s ease;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Dag)</dt>
+                                    <dd class="col-sm-8">@item.Dag</dd>
 
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id"><img src="~/images/pencil-square.svg" style="width: 20px;"/></a>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Dag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DagCode)
-                </td>
-                <td>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.DagCode)</dt>
+                                    <dd class="col-sm-8">
+                                        <span class="badge bg-info">@item.DagCode</span>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+    }
+</ul>

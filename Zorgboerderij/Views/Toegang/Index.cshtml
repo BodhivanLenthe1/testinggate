@@ -1,66 +1,72 @@
 ﻿@model IEnumerable<Zorgboerderij.Entities.UserAccount>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Gebruikers";
 }
-
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@ViewData["Title"]</h1>
+    <div class="input-group" style="max-width: 300px;">
+        <input type="text" class="form-control" placeholder="Zoeken..." id="searchInput"
+               onkeyup="searchList('searchInput', '.user-row')" />
+        <span class="input-group-text">
+            <img src="~/images/search.svg" style="width: 20px;" />
+        </span>
+    </div>
+</div>
 <p>
-    <a asp-action="Create" class="nav-link text-dark"><img src="~/images/person-plus-fill.svg" style="width: 20px;" /><b> Nieuwe gebruiker toevoegen</b></a>
+    <a asp-action="Create" class="btn btn-primary btn-sm d-flex align-items-center p-2" style="max-width: 250px; background: #4374b8; font-weight: 500; border-radius: 16px;">
+        <img src="~/images/person-plus-fill.svg" class="me-2" style="width: 18px;" />
+        Nieuwe gebruiker toevoegen
+    </a>
 </p>
+<ul class="list-group mt-4">
+    @foreach (var user in Model)
+    {
+        <li class="list-group-item" style="border-radius: 16px; border-bottom: groove;">
+            <div class="d-flex justify-content-between align-items-center user-row p-3"
+                 onclick="toggleDetails('@user.Id', 'user-details', 'userDetails-')"
+                 style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 me-3" style="font-weight: 600;">@user.Voornaam @user.Achternaam</h5>
+                    <span class="text-muted">@user.Gebruikersnaam</span>
+                </div>
+                <div onclick="event.stopPropagation();">
+                    <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-outline-primary btn-sm me-2">
+                        <img src="~/images/pencil-square.svg" style="width: 18px;" />
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-outline-danger btn-sm">
+                        <img src="~/images/trash3-fill.svg" style="width: 18px;" />
+                    </a>
+                </div>
+            </div>
+            <div id="userDetails-@user.Id" class="user-details mt-3" style="display: none; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.5s ease, opacity 0.4s ease;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-4">Organisatie ID</dt>
+                                    <dd class="col-sm-8">@user.OrgId</dd>
 
+                                    <dt class="col-sm-4">Voornaam</dt>
+                                    <dd class="col-sm-8">@user.Voornaam</dd>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Aanpassen
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OrgId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Voornaam)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Achternaam)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Gebruikersnaam)
-            </th>
-            <th>
+                                    <dt class="col-sm-4">Achternaam</dt>
+                                    <dd class="col-sm-8">@user.Achternaam</dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-4">Email</dt>
+                                    <dd class="col-sm-8">@user.Email</dd>
 
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id"><img src="~/images/pencil-square.svg" style="width: 20px;"/></a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id"><img src="~/images/trash3-fill.svg" style="width: 20px;" /></a>
-                </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OrgId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Voornaam)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Achternaam)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Gebruikersnaam)
-            </td>
-            <td>
-
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                                    <dt class="col-sm-4">Gebruikersnaam</dt>
+                                    <dd class="col-sm-8">@user.Gebruikersnaam</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+    }
+</ul>

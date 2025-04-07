@@ -147,10 +147,6 @@ namespace Zorgboerderij.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Afwezig")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Dinsdag")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -162,7 +158,7 @@ namespace Zorgboerderij.Migrations
                     b.Property<string>("FotoFile")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Goepskleur")
+                    b.Property<string>("Groepskleur")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

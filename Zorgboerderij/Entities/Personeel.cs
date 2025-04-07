@@ -15,20 +15,18 @@ namespace Zorgboerderij.Entities
         [DisplayName("Foto")]
         public string? FotoFile { get; set; }
 
-        public int Maandag { get; set; }
+        public string Maandag { get; set; }
 
-        public int Dinsdag { get; set; }
+        public string Dinsdag { get; set; }
 
-        public int Woensdag { get; set; }
+        public string Woensdag { get; set; }
 
-        public int Donderdag { get; set; }
+        public string Donderdag { get; set; }
 
-        public int Vrijdag { get; set; }
+        public string Vrijdag { get; set; }
 
-        public int Zaterdag { get; set; }
+        public string Zaterdag { get; set; }
 
-        public string Afwezig { get; set; }
-
-        public string Goepskleur { get; set; }
+        public string Groepskleur { get; set; }
     }
 }

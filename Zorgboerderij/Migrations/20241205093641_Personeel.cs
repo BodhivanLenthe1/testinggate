@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿   using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -25,8 +25,7 @@ namespace Zorgboerderij.Migrations
                     Donderdag = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Vrijdag = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Zaterdag = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Afwezig = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Goepskleur = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Groepskleur = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

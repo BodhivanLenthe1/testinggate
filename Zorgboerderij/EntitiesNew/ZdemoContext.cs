@@ -36,7 +36,6 @@ public partial class ZdemoContext : DbContext
     public virtual DbSet<Tblpersoneel> Tblpersoneels { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=ZDemo;Trusted_Connection=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -246,7 +245,6 @@ public partial class ZdemoContext : DbContext
                 .HasMaxLength(100)
                 .IsFixedLength()
                 .HasColumnName("achternaam");
-            entity.Property(e => e.Afwezig).HasColumnName("afwezig");
             entity.Property(e => e.Dinsdag).HasColumnName("dinsdag");
             entity.Property(e => e.Donderdag).HasColumnName("donderdag");
             entity.Property(e => e.Foto)

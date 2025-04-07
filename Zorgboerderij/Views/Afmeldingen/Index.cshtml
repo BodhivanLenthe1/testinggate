@@ -1,74 +1,78 @@
 ﻿@model IEnumerable<Zorgboerderij.Entities.Afmeldingen>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Afmeldingen";
 }
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Overzicht afmeldingen</h1>
+    <div class="input-group" style="max-width: 300px;">
+        <input type="text" class="form-control" placeholder="Zoeken..." id="searchInput"
+               onkeyup="searchList('searchInput', '.afmelding-row')" />
+        <span class="input-group-text">
+            <img src="~/images/search.svg" style="width: 20px;" />
+        </span>
+    </div>
+</div>
 
-<h1>Overzicht afmeldingen</h1>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Client)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Tandarts)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Vakantie)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Verjaardag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Ziek)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Vrij)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Dokter)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OpKarwei)
-            </th>
-            <th>
-
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Client)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tandarts)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Vakantie)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Verjaardag)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ziek)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Vrij)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Dokter)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OpKarwei)
-            </td>
-            <td>
-
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<ul class="list-group mt-4">
+    @foreach (var item in Model)
+    {
+        <li class="list-group-item" style="border-radius: 16px; border-bottom: groove;">
+            <div class="d-flex justify-content-between align-items-center afmelding-row p-3"
+                 onclick="toggleDetails('@item.Id', 'afmelding-details', 'afmeldingDetails-')"
+                 style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 me-3" style="font-weight: 600;">@item.Client</h5>
+                </div>
+            </div>
+            <div id="afmeldingDetails-@item.Id" class="afmelding-details mt-3" style="display: none; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.5s ease, opacity 0.4s ease;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-4">Client</dt>
+                                    <dd class="col-sm-8">@item.Client</dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Reden afwezigheid:</h6>
+                                <table class="table table-bordered table-sm">
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="badge bg-info">Tandarts</span></td>
+                                            <td>@item.Tandarts</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-primary">Vakantie</span></td>
+                                            <td>@item.Vakantie</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-success">Verjaardag</span></td>
+                                            <td>@item.Verjaardag</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-danger">Ziek</span></td>
+                                            <td>@item.Ziek</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-secondary">Vrij</span></td>
+                                            <td>@item.Vrij</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-warning text-dark">Dokter</span></td>
+                                            <td>@item.Dokter</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-dark">Op Karwei</span></td>
+                                            <td>@item.OpKarwei</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+    }
+</ul>

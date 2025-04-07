@@ -18,14 +18,11 @@ namespace Zorgboerderij.Controllers
             _context = context;
         }
 
-        
         public async Task<IActionResult> Index()
         {
             return View(await _context.clienten.ToListAsync());
         }
 
-
-      
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,7 +31,7 @@ namespace Zorgboerderij.Controllers
             }
 
             var clienten = await _context.clienten
-                .FirstOrDefaultAsync(m => m.persid == id);  
+              .FirstOrDefaultAsync(m => m.persid == id);
             if (clienten == null)
             {
                 return NotFound();
@@ -42,26 +39,27 @@ namespace Zorgboerderij.Controllers
 
             return View(clienten);
         }
-
         public IActionResult Create()
         {
             return View();
         }
 
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Afwezig,Goepskleur")] Clienten clienten)
+        public async Task<IActionResult> Create([Bind("Voornaam,Achternaam,FotoFile,Groepskleur")] Clienten clienten)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(clienten);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(clienten);
-        }
+            clienten.Maandag = Request.Form["Maandag"].ToString();
+            clienten.Dinsdag = Request.Form["Dinsdag"].ToString();
+            clienten.Woensdag = Request.Form["Woensdag"].ToString();
+            clienten.Donderdag = Request.Form["Donderdag"].ToString();
+            clienten.Vrijdag = Request.Form["Vrijdag"].ToString();
+            clienten.Zaterdag = Request.Form["Zaterdag"].ToString();
 
+            _context.Add(clienten);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -79,41 +77,65 @@ namespace Zorgboerderij.Controllers
             return View(clienten);
         }
 
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Afwezig,Goepskleur")] Clienten clienten)
+        public async Task<IActionResult> Edit(int id, [Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Groepskleur")] Clienten clienten)
         {
-            if (id != clienten.persid)  
+            if (id != clienten.persid)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                var existingClient = await _context.clienten.FindAsync(id);
+                if (existingClient == null)
                 {
-                    _context.Update(clienten);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ClientenExists(clienten.persid)) 
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                existingClient.Voornaam = clienten.Voornaam;
+                existingClient.Achternaam = clienten.Achternaam;
+                existingClient.FotoFile = clienten.FotoFile;
+                existingClient.Maandag = clienten.Maandag;
+                existingClient.Dinsdag = clienten.Dinsdag;
+                existingClient.Woensdag = clienten.Woensdag;
+                existingClient.Donderdag = clienten.Donderdag;
+                existingClient.Vrijdag = clienten.Vrijdag;
+                existingClient.Zaterdag = clienten.Zaterdag;
+                existingClient.Groepskleur = clienten.Groepskleur;
+
+                Console.WriteLine($"Edit - Maandag: {existingClient.Maandag}, Dinsdag: {existingClient.Dinsdag}");
+
+                _context.Update(existingClient);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ClientenExists(clienten.persid))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in Edit: {ex.Message}");
+                ViewBag.ErrorMessage = ex.Message;
+            }
+
             return View(clienten);
         }
 
-        // GET: Clienten/Delete/5
+        private bool ClientenExists(int id)
+        {
+            return _context.clienten.Any(e => e.persid == id);
+        }
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -122,7 +144,8 @@ namespace Zorgboerderij.Controllers
             }
 
             var clienten = await _context.clienten
-                .FirstOrDefaultAsync(m => m.persid == id);  
+              .FirstOrDefaultAsync(m => m.persid == id);
+            if (clienten == null)
             {
                 return NotFound();
             }
@@ -130,7 +153,6 @@ namespace Zorgboerderij.Controllers
             return View(clienten);
         }
 
-        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -140,14 +162,8 @@ namespace Zorgboerderij.Controllers
             {
                 _context.clienten.Remove(clienten);
             }
-
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ClientenExists(int id)
-        {
-            return _context.clienten.Any(e => e.persid == id);  
         }
     }
 }

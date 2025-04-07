@@ -25,8 +25,7 @@ namespace Zorgboerderij.Migrations
                     Donderdag = table.Column<string>(type: "nvarchar(1)", nullable: false),
                     Vrijdag = table.Column<string>(type: "nvarchar(1)", nullable: false),
                     Zaterdag = table.Column<string>(type: "nvarchar(1)", nullable: false),
-                    Afwezig = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Goepskleur = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Groepskleur = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

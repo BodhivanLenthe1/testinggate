@@ -1,44 +1,141 @@
 ﻿@model IEnumerable<Zorgboerderij.Entities.Personeel>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Personeel";
+}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@ViewData["Title"]</h1>
+    <div class="input-group" style="max-width: 300px;">
+        <input type="text" class="form-control" placeholder="Zoeken..." id="searchInput"
+               onkeyup="searchList('searchInput', '.personeel-row')" />
+        <span class="input-group-text">
+            <img src="~/images/search.svg" style="width: 20px;" />
+        </span>
+    </div>
+</div>
+<p>
+    <a asp-action="Create" class="btn btn-primary btn-sm d-flex align-items-center p-2" style="max-width: 250px; background: #3fa21d; font-weight: 500; border-radius: 16px;">
+        <img src="~/images/person-plus-fill.svg" class="me-2" style="width: 18px;" />
+        Nieuwe collega toevoegen
+    </a>
+</p>
+<ul class="list-group mt-4">
+    @foreach (var personeel in Model)
+    {
+        <li class="list-group-item" style="border-radius: 16px; border-bottom: groove;">
+            <div class="d-flex justify-content-between align-items-center personeel-row p-3"
+                 onclick="toggleDetails('@personeel.persid', 'personeel-details', 'personeelDetails-')"
+                 style="cursor: pointer;">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 me-3" style="font-weight: 600;">@personeel.Voornaam @personeel.Achternaam</h5>
+                </div>
+                <div onclick="event.stopPropagation();">
+                    <a asp-action="Edit" asp-route-id="@personeel.persid" class="btn btn-outline-primary btn-sm me-2">
+                        <img src="~/images/pencil-square.svg" style="width: 18px;" />
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@personeel.persid" class="btn btn-outline-danger btn-sm">
+                        <img src="~/images/trash3-fill.svg" style="width: 18px;" />
+                    </a>
+                </div>
+            </div>
+            <div id="personeelDetails-@personeel.persid" class="personeel-details mt-3" style="display: none; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.5s ease, opacity 0.4s ease;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-4">Voornaam</dt>
+                                    <dd class="col-sm-8">@personeel.Voornaam</dd>
+
+                                    <dt class="col-sm-4">Achternaam</dt>
+                                    <dd class="col-sm-8">@personeel.Achternaam</dd>
+
+                                    @if (!string.IsNullOrEmpty(personeel.FotoFile))
+                                    {
+                                        <dt class="col-sm-4">Foto</dt>
+                                        <dd class="col-sm-8">
+                                            <img src="~/images/Personeel/@personeel.FotoFile" style="max-width: 150px; max-height: 150px;" class="img-thumbnail" alt="Foto van @personeel.Voornaam" />
+                                        </dd>
+                                    }
+
+                                    <dt class="col-sm-4">Groepskleur</dt>
+                                    <dd class="col-sm-8">
+                                        <span class="badge" style="background-color: @personeel.Groepskleur">@personeel.Groepskleur</span>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Werkdagen:</h6>
+                                <table class="table table-bordered table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Dag</th>
+                                            <th>Aanwezigheid</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Maandag</td>
+                                            <td>@Html.Raw(GetAanwezigheidBadge(personeel.Maandag))</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dinsdag</td>
+                                            <td>@Html.Raw(GetAanwezigheidBadge(personeel.Dinsdag))</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Woensdag</td>
+                                            <td>@Html.Raw(GetAanwezigheidBadge(personeel.Woensdag))</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Donderdag</td>
+                                            <td>@Html.Raw(GetAanwezigheidBadge(personeel.Donderdag))</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Vrijdag</td>
+                                            <td>@Html.Raw(GetAanwezigheidBadge(personeel.Vrijdag))</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Zaterdag</td>
+                                            <td>@Html.Raw(GetAanwezigheidBadge(personeel.Zaterdag))</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+    }
+</ul>
+
+@functions {
+    public string GetAanwezigheidBadge(string aanwezigheid)
+    {
+        string badgeClass = "";
+        string text = "";
+
+        switch (aanwezigheid?.ToUpper())
+        {
+            case "O":
+                badgeClass = "bg-info";
+                text = "Ochtend";
+                break;
+            case "M":
+                badgeClass = "bg-warning";
+                text = "Middag";
+                break;
+            case "H":
+                badgeClass = "bg-success";
+                text = "Hele dag";
+                break;
+            case "X":
+            default:
+                badgeClass = "bg-secondary";
+                text = "Afwezig";
+                break;
+        }
+
+        return $"<span class=\"badge {badgeClass}\">{text}</span>";
+    }
 }
 
-<p>
-    <p>
-        <a asp-action="Create" class="nav-link text-dark"><img src="~/images/person-plus-fill.svg" style="width: 20px;" /><b> Nieuwe collega toevoegen</b></a>
-    </p>
-
-    <div class="personeel-container" style="display: flex; flex-wrap: wrap;">
-        @foreach (var personeel in Model)
-        {
-        <div style="margin: 10px; text-align: center;">
-            <img src="~/images/Personeel/@personeel.FotoFile" style="width: 225px; height: 125px;" />
-            <h3 class="">@personeel.Voornaam @personeel.Achternaam</h3>
-
-            <a asp-action="Edit" asp-route-id="@personeel.persid"><img src="~/images/pencil-square.svg" style="width:25px; margin-bottom: 10px;"/></a>
-            <a asp-action="Delete" asp-route-id="@personeel.persid"><img src="~/images/trash3-fill.svg" style="width:25px; margin-bottom: 10px;" /></a>
-
-            <table class="table table-bordered">
-                <thead>
-                    <th>Ma</th>
-                    <th>Di</th>
-                    <th>Wo</th>
-                    <th>Do</th>
-                    <th>Vr</th>
-                    <th>Za</th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>@(personeel.Maandag == 1 ? "X" : "-")</td>
-                        <td>@(personeel.Dinsdag == 1 ? "X" : "-")</td>
-                        <td>@(personeel.Woensdag == 1 ? "X" : "-")</td>
-                        <td>@(personeel.Donderdag == 1 ? "X" : "-")</td>
-                        <td>@(personeel.Vrijdag == 1 ? "X" : "-")</td>
-                        <td>@(personeel.Zaterdag == 1 ? "X" : "-")</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    }
-</div>

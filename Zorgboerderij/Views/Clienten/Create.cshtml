@@ -1,118 +1,93 @@
 ﻿@model Zorgboerderij.Entities.Clienten
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Cliënt Aanmaken";
 }
 
 <div class="d-flex justify-content-center">
     <div class="col-md-5">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <form asp-controller="Clienten" asp-action="Create" method="post" class="p-3 rounded shadow">
+            <h4 class="text-center mb-2">@ViewData["Title"]</h4>
 
-            <div class="form-group mb-3">
-                <label asp-for="Voornaam" class="control-label text-primary"></label>
-                <input asp-for="Voornaam" class="form-control" />
-                <span asp-validation-for="Voornaam" class="text-danger"></span>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row mb-2">
+                <div class="col">
+                    <label asp-for="Voornaam" class="form-label fw-bold"></label>
+                    <input asp-for="Voornaam" class="form-control form-control-sm" required />
+                </div>
+                <div class="col">
+                    <label asp-for="Achternaam" class="form-label fw-bold"></label>
+                    <input asp-for="Achternaam" class="form-control form-control-sm" required />
+                </div>
             </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="Achternaam" class="control-label text-primary"></label>
-                <input asp-for="Achternaam" class="form-control" />
-                <span asp-validation-for="Achternaam" class="text-danger"></span>
-            </div>
-
-            <div class="form-group mb-3">
-                <label asp-for="FotoFile" class="control-label text-primary"></label>
-                <select class="form-select" asp-for="FotoFile">
+            <div class="mb-2">
+                <label asp-for="FotoFile" class="form-label fw-bold"></label>
+                <select class="form-select form-select-sm" asp-for="FotoFile">
+                    <option value="" selected disabled>Kies een foto</option>
                     <option value="Davy.jpg">Davy</option>
                     <option value="Eric S.jpg">Eric</option>
                     <option value="Walter.jpg">Walter</option>
                     <option value="Qutaiba.jpg">Qutaiba</option>
                 </select>
-                <span asp-validation-for="FotoFile" class="text-danger"></span>
             </div>
 
             @foreach (var dag in new[] { "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag" })
             {
-                <div class="form-group mb-3">
-                    <label asp-for="@dag" class="control-label text-primary">@dag</label>
-                    <div>
-                        <label class="text-success">
-                            <input type="radio" name="@dag-Status" value="1" onclick="toggleTimeOptions('@dag', true)" /> Aanwezig
-                        </label>
-                        <label class="text-danger">
-                            <input type="radio" name="@dag-Status" value="0" onclick="toggleTimeOptions('@dag', false)" /> Afwezig
-                        </label>
+                <div class="form-group mb-2 p-2">
+                    <label class="fw-bold">@dag</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="@dag" value="O">
+                            <label class="form-check-label text-success">Ochtend</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="@dag" value="M">
+                            <label class="form-check-label text-warning">Middag</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="@dag" value="H">
+                            <label class="form-check-label text-primary">Hele dag</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" name="@dag" value="X" checked>
+                            <label class="form-check-label text-danger">Afwezig</label>
+                        </div>
                     </div>
-
-                    <div id="@dag-TimeOptions" class="time-options mt-2" style="display: none;">
-                        <label class="text-primary">Keuze tijd</label><br />
-                        <label>
-                            <input type="radio" name="@dag-Time" value="Ochtend" /> Ochtend
-                        </label>
-                        <label>
-                            <input type="radio" name="@dag-Time" value="Middag" /> Middag
-                        </label>
-                        <label>
-                            <input type="radio" name="@dag-Time" value="Hele dag" /> Hele dag
-                        </label>
-                    </div>
-
-                    <span asp-validation-for="@dag" class="text-danger"></span>
                 </div>
             }
-
-           
-            <div class="form-group mb-3">
-                <label asp-for="Goepskleur" class="control-label text-primary"></label>
-                <select class="form-select" asp-for="Goepskleur">
+            <div class="mb-2">
+                <label asp-for="Groepskleur" class="form-label fw-bold"></label>
+                <select class="form-select form-select-sm" asp-for="Groepskleur">
                     <option value="Geel">Geel</option>
                     <option value="Rood">Rood</option>
                     <option value="Blauw">Blauw</option>
                 </select>
-                <span asp-validation-for="Goepskleur" class="text-danger"></span>
             </div>
 
-            <div class="form-group mt-3">
-                <input type="submit" value="Collega aanmaken" class="btn btn-success w-100 mb-2" />
-                <p class="text-center"><a asp-action="Index" class="nav-link text-dark">Terug</a></p>
+            <div class="mt-2 text-center">
+                <button type="submit" class="btn btn-success btn-sm w-100">Opslaan</button>
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm mt-2 w-100">Terug</a>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    // Functie om de tijdopties te tonen/verbergen
-    function toggleTimeOptions(day, isPresent) {
-        // Verberg eerst alle tijdopties
-        var timeOptions = document.querySelectorAll('.time-options');
-        timeOptions.forEach(function (option) {
-            option.style.display = 'none';
-        });
+    document.querySelectorAll("input[type=radio][name$='-Status']").forEach(function (radio) {
+        radio.addEventListener("change", function () {
+            var dag = this.name.split("-")[0];
+            var tijdOptions = document.getElementById(dag + "-TimeOptions");
+            var hiddenInput = document.getElementById(dag);
 
-        // Als de dag "Aanwezig" is, toon de tijdopties
-        if (isPresent) {
-            var selectedDay = document.getElementById(day + '-TimeOptions');
-            if (selectedDay) {
-                selectedDay.style.display = 'block';
+            if (this.value === "Aanwezig") {
+                tijdOptions.classList.remove('d-none');
+                hiddenInput.value = "Aanwezig";
+            } else {
+                tijdOptions.classList.add('d-none');
+                hiddenInput.value = "Afwezig";
             }
-        } else {
-            var selectedDay = document.getElementById(day + '-TimeOptions');
-            if (selectedDay) {
-                selectedDay.style.display = 'none';
-            }
-        }
-
-        // Reset de radio knoppen voor de andere status (om ervoor te zorgen dat de knoppen niet vast blijven staan)
-        var radios = document.querySelectorAll(`input[name='${day}-Status']`);
-        radios.forEach(function (radio) {
-            radio.checked = false;
         });
-        // Markeer de geselecteerde knop
-        var selectedRadio = document.querySelector(`input[name='${day}-Status'][value='${isPresent ? '1' : '0'}']`);
-        if (selectedRadio) {
-            selectedRadio.checked = true;
-        }
-    }
-
+    });
 </script>

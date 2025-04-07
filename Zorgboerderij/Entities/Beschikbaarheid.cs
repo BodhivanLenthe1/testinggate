@@ -26,8 +26,6 @@ namespace Zorgboerderij.Entities
         [DisplayName("Zaterdag")]
         public string Zaterdag { get; set; } // Beschikbaarheid Zaterdag (bijv. O, M, H, X)
 
-        [DisplayName("Afwezig")]
-        public string Afwezig { get; set; } // Kan extra informatie zijn, zoals "Afwezig" of "Onbeschikbaar" als een alternatieve status
 
         [DisplayName("Groepskleur")]
         public string Groepskleur { get; set; } // Kan worden gebruikt om kleur te geven op basis van groepsstatus, indien van toepassing

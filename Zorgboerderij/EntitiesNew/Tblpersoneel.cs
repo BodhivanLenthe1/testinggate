@@ -25,7 +25,5 @@ public partial class Tblpersoneel
 
     public int? Zaterdag { get; set; }
 
-    public int? Afwezig { get; set; }
-
     public int? Groepskleur { get; set; }
 }
