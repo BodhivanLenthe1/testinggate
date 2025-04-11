@@ -4,51 +4,78 @@
     ViewData["Title"] = "Create";
 }
 
-<h1 class="text-center">Gebruiker toevoegen</h1>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="card shadow-lg border-0 rounded-4 p-4" style="width: 100%; max-width: 500px;">
+        <div class="text-white text-center mb-4 py-3 px-2 rounded-3"
+             style="background: linear-gradient(135deg, #4374b8, #4374b8); box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+            <h4 class="mb-0"><i class="fas fa-user-plus"></i> Gebruiker Toevoegen</h4>
+        </div>
 
-<hr />
-<div class="d-flex justify-content-center">
-    <div class="col-md-5">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="OrgId" class="control-label"></label>
-                <input asp-for="OrgId" class="form-control" />
-                <span asp-validation-for="OrgId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Voornaam" class="control-label"></label>
-                <input asp-for="Voornaam" class="form-control" />
-                <span asp-validation-for="Voornaam" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Achternaam" class="control-label"></label>
-                <input asp-for="Achternaam" class="form-control" />
-                <span asp-validation-for="Achternaam" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Gebruikersnaam" class="control-label"></label>
-                <input asp-for="Gebruikersnaam" class="form-control" />
-                <span asp-validation-for="Gebruikersnaam" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Wachtwoord" class="control-label"></label>
-                <input asp-for="Wachtwoord" class="form-control" type="password" />
-                <span asp-validation-for="Wachtwoord" class="text-danger"></span>
-            </div>
-            <div class="form-group mt-2">
-                <input type="submit" value="Gebruiker aanmaken" class="btn btn-primary w-100 mb-2" />
-                <p class="text-center"><a asp-action="Index" class="nav-link text-dark">Terug</a></p>
-            </div>
-        </form>
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <table class="table table-bordered table-striped table-hover">
+                    <tbody>
+                        <tr>
+                            <td class="w-25">Organisatie ID</td>
+                            <td>
+                                <input asp-for="OrgId" class="form-control" />
+                                <span asp-validation-for="OrgId" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Voornaam</td>
+                            <td>
+                                <input asp-for="Voornaam" class="form-control" />
+                                <span asp-validation-for="Voornaam" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Achternaam</td>
+                            <td>
+                                <input asp-for="Achternaam" class="form-control" />
+                                <span asp-validation-for="Achternaam" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">E-mail</td>
+                            <td>
+                                <input asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Gebruikersnaam</td>
+                            <td>
+                                <input asp-for="Gebruikersnaam" class="form-control" />
+                                <span asp-validation-for="Gebruikersnaam" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Wachtwoord</td>
+                            <td>
+                                <input asp-for="Wachtwoord" class="form-control" type="password" />
+                                <span asp-validation-for="Wachtwoord" class="text-danger"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="form-group mt-3">
+                    <input type="submit" value="Gebruiker aanmaken" class="btn w-100 mb-2 text-white"
+                           style="background: linear-gradient(135deg, #4374b8, #4374b8); border: none;" />
+                    <p class="text-center mb-0">
+                        <a asp-action="Index" class="nav-link text-dark">Terug</a>
+                    </p>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
