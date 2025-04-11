@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Zorgboerderij.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="d-flex justify-content-center w-100" style="margin-left: 140px;">
@@ -18,15 +19,16 @@
             @await Html.PartialAsync("_PartialLayout")
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="container" style="flex: 1;">
+        <main role="main" class="pb-3" style="flex-grow: 1;">
             @RenderBody()
         </main>
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
-            <p class="text-center"><b>Gebruikersovereenkomst:&nbsp;</b> Demo Planbord ICT@Work | ICT@School</p>
+        <div class="container text-center py-3">
+            <b>Gebruikersovereenkomst:</b> Demo Planbord ICT@Work | ICT@School
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

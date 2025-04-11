@@ -5,7 +5,7 @@ namespace Zorgboerderij.EntitiesNew;
 
 public partial class Tblclienten
 {
-    public int Clientid { get; set; }
+    public int clientId { get; set; }
 
     public string? Voornaam { get; set; }
 

@@ -1,0 +1,204 @@
+﻿@model Zorgboerderij.Entities.DagBezettingViewModel
+@{
+    ViewBag.Title = "Bezetting voor " + Model.Dag;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+    <h1 class="text-center fw-bold mb-5" style="font-size:2.5rem;">Bezetting voor @Model.Dag</h1>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header" style="background-color:#4374b8; color:white;">
+                    <h4 class="mb-0">Clienten</h4>
+                </div>
+                <div class="card-body">
+                    <p class="fs-5">Totaal: <strong>@Model.AantalClienten</strong></p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0">
+                            <thead style="background-color:#4374b8; color:white;">
+                                <tr>
+                                    <th>Dagdeel</th>
+                                    <th>Aantal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ochtend</td>
+                                    <td>@Model.ClientOchtend</td>
+                                </tr>
+                                <tr>
+                                    <td>Middag</td>
+                                    <td>@Model.ClientMiddag</td>
+                                </tr>
+                                <tr>
+                                    <td>Hele dag</td>
+                                    <td>@Model.ClientHeleDag</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header" style="background-color:#4374b8; color:white;">
+                    <h4 class="mb-0">Personeel</h4>
+                </div>
+                <div class="card-body">
+                    <p class="fs-5">Totaal: <strong>@Model.AantalPersoneel</strong></p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0">
+                            <thead style="background-color:#4374b8; color:white;">
+                                <tr>
+                                    <th>Dagdeel</th>
+                                    <th>Aantal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ochtend</td>
+                                    <td>@Model.PersoneelOchtend</td>
+                                </tr>
+                                <tr>
+                                    <td>Middag</td>
+                                    <td>@Model.PersoneelMiddag</td>
+                                </tr>
+                                <tr>
+                                    <td>Hele dag</td>
+                                    <td>@Model.PersoneelHeleDag</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-bold">09:00</span>
+            <span class="fw-bold">12:00</span>
+            <span class="fw-bold">17:00</span>
+        </div>
+        <hr class="mt-2 mb-3" style="border-top: 2px solid #ccc;">
+        <div class="mb-2 d-flex gap-2">
+            <span class="badge" style="background-color:#4374b8;">Ochtend (09:00 - 12:00)</span>
+            <span class="badge" style="background-color:#4374b8;">Middag (12:00 - 17:00)</span>
+            <span class="badge" style="background-color:#4374b8;">Hele dag (09:00 - 17:00)</span>
+        </div>
+    </div>
+    <h4 class="text-secondary mb-3">Clienten</h4>
+    @foreach (var client in Model.ClientList)
+    {
+        string ts = "";
+        string label = "";
+        switch (Model.Dag)
+        {
+            case "Maandag": ts = client.Maandag; break;
+            case "Dinsdag": ts = client.Dinsdag; break;
+            case "Woensdag": ts = client.Woensdag; break;
+            case "Donderdag": ts = client.Donderdag; break;
+            case "Vrijdag": ts = client.Vrijdag; break;
+            case "Zaterdag": ts = client.Zaterdag; break;
+        }
+        if (!string.IsNullOrEmpty(ts))
+        {
+            switch (ts.ToLower())
+            {
+                case "o":
+                    label = "09:00 - 12:00";
+                    break;
+                case "m":
+                    label = "12:00 - 17:00";
+                    break;
+                case "h":
+                    label = "09:00 - 17:00";
+                    break;
+            }
+        }
+        <div class="d-flex align-items-center mb-3">
+            <div class="me-3 fw-bold" style="width:180px; font-size:1.1rem; color:#333;">
+                @client.Voornaam @client.Achternaam
+            </div>
+            <div class="flex-grow-1 position-relative" style="height:40px; background-color:#f9f9f9; border:1px solid #ddd; border-radius:6px;">
+                @if (ts.ToLower() == "o")
+                {
+                    <div style="position:absolute; left:0; top:0; width:37.5%; height:100%; background-color:#4374b8; border-radius:6px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                        @label
+                    </div>
+                }
+                else if (ts.ToLower() == "m")
+                {
+                    <div style="position:absolute; left:37.5%; top:0; width:62.5%; height:100%; background-color:#4374b8; border-radius:6px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                        @label
+                    </div>
+                }
+                else if (ts.ToLower() == "h")
+                {
+                    <div style="position:absolute; left:0; top:0; width:100%; height:100%; background-color:#4374b8; border-radius:6px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                        @label
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <h4 class="text-secondary mt-5 mb-3">Personeel</h4>
+    @foreach (var pers in Model.PersoneelList)
+    {
+        string ts = "";
+        string label = "";
+        switch (Model.Dag)
+        {
+            case "Maandag": ts = pers.Maandag; break;
+            case "Dinsdag": ts = pers.Dinsdag; break;
+            case "Woensdag": ts = pers.Woensdag; break;
+            case "Donderdag": ts = pers.Donderdag; break;
+            case "Vrijdag": ts = pers.Vrijdag; break;
+            case "Zaterdag": ts = pers.Zaterdag; break;
+        }
+        if (!string.IsNullOrEmpty(ts))
+        {
+            switch (ts.ToLower())
+            {
+                case "o":
+                    label = "09:00 - 12:00";
+                    break;
+                case "m":
+                    label = "12:00 - 17:00";
+                    break;
+                case "h":
+                    label = "09:00 - 17:00";
+                    break;
+            }
+        }
+        <div class="d-flex align-items-center mb-3">
+            <div class="me-3 fw-bold" style="width:180px; font-size:1.1rem; color:#333;">
+                @pers.Voornaam @pers.Achternaam
+            </div>
+            <div class="flex-grow-1 position-relative" style="height:40px; background-color:#f9f9f9; border:1px solid #ddd; border-radius:6px;">
+                @if (ts.ToLower() == "o")
+                {
+                    <div style="position:absolute; left:0; top:0; width:37.5%; height:100%; background-color:#4374b8; border-radius:6px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                        @label
+                    </div>
+                }
+                else if (ts.ToLower() == "m")
+                {
+                    <div style="position:absolute; left:37.5%; top:0; width:62.5%; height:100%; background-color:#4374b8; border-radius:6px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                        @label
+                    </div>
+                }
+                else if (ts.ToLower() == "h")
+                {
+                    <div style="position:absolute; left:0; top:0; width:100%; height:100%; background-color:#4374b8; border-radius:6px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem;">
+                        @label
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

@@ -46,20 +46,37 @@ namespace Zorgboerderij.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Voornaam,Achternaam,FotoFile,Groepskleur")] Clienten clienten)
+        public async Task<IActionResult> Create([Bind("Voornaam,Achternaam,Groepskleur")] Clienten clienten, IFormFile Foto)
         {
-            clienten.Maandag = Request.Form["Maandag"].ToString();
-            clienten.Dinsdag = Request.Form["Dinsdag"].ToString();
-            clienten.Woensdag = Request.Form["Woensdag"].ToString();
-            clienten.Donderdag = Request.Form["Donderdag"].ToString();
-            clienten.Vrijdag = Request.Form["Vrijdag"].ToString();
-            clienten.Zaterdag = Request.Form["Zaterdag"].ToString();
+            clienten.Maandag = Request.Form["Maandag"];
+            clienten.Dinsdag = Request.Form["Dinsdag"];
+            clienten.Woensdag = Request.Form["Woensdag"];
+            clienten.Donderdag = Request.Form["Donderdag"];
+            clienten.Vrijdag = Request.Form["Vrijdag"];
+            clienten.Zaterdag = Request.Form["Zaterdag"];
+
+            if (Foto != null && Foto.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/clienten");
+                Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Foto.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await Foto.CopyToAsync(fileStream);
+                }
+
+                clienten.FotoFile = uniqueFileName;
+            }
 
             _context.Add(clienten);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
+
 
         public async Task<IActionResult> Edit(int? id)
         {
@@ -79,23 +96,42 @@ namespace Zorgboerderij.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Groepskleur")] Clienten clienten)
+        public async Task<IActionResult> Edit(int id, [Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Groepskleur")] Clienten clienten, IFormFile Foto)
         {
             if (id != clienten.persid)
-            {
                 return NotFound();
-            }
 
             try
             {
                 var existingClient = await _context.clienten.FindAsync(id);
                 if (existingClient == null)
-                {
                     return NotFound();
+
+                if (Foto != null && Foto.Length > 0)
+                {
+                    if (!string.IsNullOrEmpty(existingClient.FotoFile))
+                    {
+                        var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/clienten", existingClient.FotoFile);
+                        if (System.IO.File.Exists(oldPath))
+                            System.IO.File.Delete(oldPath);
+                    }
+
+                    string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/clienten");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Foto.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await Foto.CopyToAsync(fileStream);
+                    }
+
+                    existingClient.FotoFile = uniqueFileName;
                 }
+
                 existingClient.Voornaam = clienten.Voornaam;
                 existingClient.Achternaam = clienten.Achternaam;
-                existingClient.FotoFile = clienten.FotoFile;
                 existingClient.Maandag = clienten.Maandag;
                 existingClient.Dinsdag = clienten.Dinsdag;
                 existingClient.Woensdag = clienten.Woensdag;
@@ -104,32 +140,19 @@ namespace Zorgboerderij.Controllers
                 existingClient.Zaterdag = clienten.Zaterdag;
                 existingClient.Groepskleur = clienten.Groepskleur;
 
-                Console.WriteLine($"Edit - Maandag: {existingClient.Maandag}, Dinsdag: {existingClient.Dinsdag}");
-
                 _context.Update(existingClient);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ClientenExists(clienten.persid))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in Edit: {ex.Message}");
                 ViewBag.ErrorMessage = ex.Message;
+                return View(clienten);
             }
-
-            return View(clienten);
         }
+
 
         private bool ClientenExists(int id)
         {
@@ -160,10 +183,18 @@ namespace Zorgboerderij.Controllers
             var clienten = await _context.clienten.FindAsync(id);
             if (clienten != null)
             {
+                if (!string.IsNullOrEmpty(clienten.FotoFile))
+                {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/clienten", clienten.FotoFile);
+                    if (System.IO.File.Exists(path))
+                        System.IO.File.Delete(path);
+                }
+
                 _context.clienten.Remove(clienten);
+                await _context.SaveChangesAsync();
             }
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
     }
 }

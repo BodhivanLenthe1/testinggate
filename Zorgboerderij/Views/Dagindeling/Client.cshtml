@@ -1,0 +1,390 @@
+﻿@model Zorgboerderij.Entities.DagindelingViewModel
+@{
+    ViewData["Title"] = "Dagplanning";
+    var client = Model.Client;
+    var kleurOmschrijvingen = new Dictionary<string, string>
+    {
+        {"blauw", "Dieren"},
+        {"paars", "Verzorgen"},
+        {"groen", "Tuin"},
+        {"oranje", "Land"},
+        {"geel", "Corvee"},
+        {"rood", "Creatief"},
+        {"grijs", "Schuur"},
+        {"zwart", "Klussen"},
+        {"bruin", "Tijden"},
+        {"lichtgroen", "Test"}
+    };
+}
+
+<div style="padding:20px; font-family:'Segoe UI', sans-serif; max-width:1400px; margin:auto;">
+    @* <p style="color:red;">🛠️ DEBUG: Vandaag is @ViewBag.DebugDag</p> *@
+    <h2 style="margin-bottom:20px;">Dagplanning voor @client.Voornaam @client.Achternaam</h2>
+    <div style="display:flex; flex-wrap:wrap; gap:20px;">
+        <div style="flex:1; min-width:250px; max-width:300px;">
+            <div style="border:3px solid @client.Groepskleur.ToLower(); border-radius:10px; padding:15px; display:flex; align-items:center; gap:15px;">
+                <img src="@Url.Content($"~/images/clienten/{client.FotoFile}")" style="width:90px; height:90px; border-radius:50%; object-fit:cover; box-shadow:0 0 6px rgba(0,0,0,0.1);" />
+                <div>
+                    <h3 style="margin:0 0 5px 0;">@client.Voornaam @client.Achternaam</h3>
+                    <div style="font-size:0.9em; color:#666;">ID: @client.persid</div>
+                </div>
+            </div>
+        </div>
+        <div style="flex:3; min-width:400px;">
+            <div style="display:flex; flex-wrap:wrap; gap:15px; align-items:center; margin-bottom:15px;">
+                <input type="text" id="searchInput" placeholder="Zoeken op titel..."
+                       style="padding:8px 12px; border:1px solid #ccc; border-radius:6px; max-width:200px; flex:1;" />
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <label for="kleurSort" style="font-weight:bold;">Kies activiteit:</label>
+                    <select id="kleurSort" style="padding:8px 12px; border-radius:6px; border:1px solid #ccc;">
+                        <option value="">Selecteer een activiteit</option>
+                        @foreach (var kleur in Model.Bakjes.Select(b => b.Kleur.ToLower()).Distinct().OrderBy(k => k))
+                        {
+                            var label = kleurOmschrijvingen.ContainsKey(kleur) ? kleurOmschrijvingen[kleur] : kleur;
+                            <option value="@kleur">@label</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div id="bakjes" class="connectedSortable"
+                 style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:10px; max-height:500px; overflow-y:auto; border:1px solid #ccc; padding:10px; border-radius:6px; background:#fafafa;">
+            </div>
+        </div>
+    </div>
+    <div style="margin-top:30px;">
+        <h4 style="margin-bottom:10px;">Tijdlijn</h4>
+        <div id="planningTimeline" class="connectedSortable"
+             style="width:105%; min-height:220px; border:2px dashed #aaa; padding:15px; display:flex; align-items:center; gap:10px; overflow-x:auto; border-radius:6px; background-color:#f9f9f9;">
+        </div>
+        <div style="text-align:center; margin-top:8px; font-size:0.85em; color:#888;">
+            Ochtend &mdash; Middag
+        </div>
+    </div>
+    <form method="post" asp-action="UpdateVolgorde" style="margin-top:25px;">
+        <input type="hidden" name="clientId" value="@client.persid" />
+        <input type="hidden" name="Samenwerkers[2]" value="5,7">
+        <input type="hidden" id="volgordeInput" name="nieuweVolgorde" />
+        <input type="hidden" name="dag" value="@ViewBag.DebugDag" />
+        <button type="submit" style="padding:10px 20px; background-color:#007bff; color:white; border:none; border-radius:5px; cursor:pointer;">
+            💾 Wijzigingen opslaan
+        </button>
+    </form>
+    <div id="samenwerkingModal"
+         style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            background:rgba(0,0,0,0.5); z-index:10000;">
+        <div style="display:flex; justify-content:center; align-items:center; height:100%;">
+            <div style="background:white; padding:25px 30px; border-radius:12px; max-width:500px; width:90%;
+                    box-shadow:0 10px 30px rgba(0,0,0,0.3); position:relative; text-align:center;">
+
+                <h3 style="margin-top:0; font-size:20px;">Samenwerken toevoegen</h3>
+                <p style="margin-bottom:15px; font-size:14px; color:#444;">
+                    Klik op maximaal <strong>2 cliënten</strong> om deze taak samen te doen:
+                </p>
+
+                <div id="partnerVisualContainer"
+                     style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr));
+                        gap:12px; margin-bottom:20px; max-height:300px; overflow-y:auto;">
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:10px;">
+                    <button id="closeSamenwerking"
+                            style="padding:8px 16px; background:#eee; border:none; border-radius:6px;
+                               font-size:14px; cursor:pointer;">
+                        ❌ Annuleren
+                    </button>
+                    <button id="confirmSamenwerking"
+                            style="padding:8px 16px; background:#28a745; color:white; border:none;
+                               border-radius:6px; font-size:14px; cursor:pointer;">
+                        ✅ Bevestigen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="popupMessage"
+         style="display:none; position:fixed; top:30px; left:50%; transform:translateX(-50%);
+            background:#dc3545; color:white; padding:10px 20px; border-radius:8px;
+            font-weight:bold; z-index:10001; box-shadow:0 4px 12px rgba(0,0,0,0.25);">
+    </div>
+</div>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script>
+    let $currentSamenwerkTaak = null;
+    let geselecteerdePartners = [];
+
+    function showPopup(message) {
+        const $popup = $("#popupMessage");
+        $popup.text(message).fadeIn(200);
+        setTimeout(() => $popup.fadeOut(400), 3000);
+    }
+
+    function openSamenwerkingPopup($taakDiv) {
+        $currentSamenwerkTaak = $taakDiv;
+        geselecteerdePartners = $taakDiv.data("samenwerkers") || [];
+
+        const $modal = $("#samenwerkingModal");
+        const $container = $("#partnerVisualContainer");
+        $container.empty();
+
+        const currentclientId = parseInt($("input[name='clientId']").val());
+
+        const partners = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+            Model.AlleClienten.Select(c => new
+            {
+                id = c.persid,
+                naam = c.Voornaam + " " + c.Achternaam,
+                foto = Url.Content($"~/images/clienten/{c.FotoFile}")
+            })
+        ));
+
+        const aanwezigePartners = partners.filter(p => p.id !== currentclientId);
+
+            if (aanwezigePartners.length === 0) {
+        $container.css({
+            "display": "flex",
+            "justify-content": "center",
+            "align-items": "center",
+            "height": "150px",
+            "width": "100%",
+            "padding": "0", 
+            "margin": "0", 
+            "background": "none",
+            "border": "none",
+            "border-radius": "0" 
+        });
+        $container.html(
+            '<div style="text-align:center; font-size:16px; color:#555;">🧍‍♂️ Er is niemand aanwezig om mee samen te werken.</div>'
+        );
+    } else {
+        $container.css({
+            "display": "grid",
+            "grid-template-columns": "repeat(auto-fill, minmax(100px, 1fr))",
+            "gap": "12px",
+            "margin-bottom": "20px",
+            "max-height": "300px",
+            "overflow-y": "auto"
+        });
+        aanwezigePartners.forEach(p => {
+            const isSelected = geselecteerdePartners.includes(p.id.toString());
+            const $card = $(`
+                <div class="partnerCard ${isSelected ? 'selected' : ''}" data-id="${p.id}"
+                     style="border:2px solid ${isSelected ? '#28a745' : 'transparent'}; border-radius:10px; padding:10px; cursor:pointer; text-align:center; transition:all 0.2s ease;">
+                    <img src="${p.foto}" style="width:60px; height:60px; border-radius:50%; object-fit:cover; margin-bottom:5px;" />
+                    <div style="font-size:13px;">${p.naam}</div>
+                </div>
+            `);
+            $card.on("click", function () {
+                const id = $(this).data("id").toString();
+                const index = geselecteerdePartners.indexOf(id);
+                if (index > -1) {
+                    geselecteerdePartners.splice(index, 1);
+                    $(this).removeClass("selected").css("border-color", "transparent");
+                } else {
+                    if (geselecteerdePartners.length >= 2) {
+                        showPopup("Maximaal 2 cliënten selecteren.");
+                        return;
+                    }
+                    geselecteerdePartners.push(id);
+                    $(this).addClass("selected").css("border-color", "#28a745");
+                }
+            });
+            $container.append($card);
+        });
+    }
+
+
+        $modal.fadeIn(200);
+    }
+
+
+    $("#closeSamenwerking").on("click", function () {
+        $("#samenwerkingModal").fadeOut(200);
+    });
+
+    $("#confirmSamenwerking").on("click", function () {
+        if ($currentSamenwerkTaak) {
+            if (geselecteerdePartners.length > 0) {
+                $currentSamenwerkTaak.data("samenwerkers", geselecteerdePartners);
+                $currentSamenwerkTaak.find(".partnerLabel").remove();
+                $currentSamenwerkTaak.append(`<div class="partnerLabel" style="margin-top:4px; font-size:11px; color:#333;">🤝 ${geselecteerdePartners.length} samenwerker(s)</div>`);
+            } else {
+                $currentSamenwerkTaak.removeData("samenwerkers");
+                $currentSamenwerkTaak.find(".partnerLabel").remove();
+            }
+        }
+        $("#samenwerkingModal").fadeOut(200);
+    });
+
+
+    window.onload = function () {
+        const kleurMap = {
+            rood: "red",
+            geel: "yellow",
+            groen: "green",
+            blauw: "blue",
+            paars: "purple",
+            oranje: "orange",
+            grijs: "gray",
+            zwart: "black",
+            bruin: "saddlebrown",
+            lichtgroen: "lightgreen"
+        };
+
+        const bakjesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Bakjes.Select(b => new
+        {
+            id = b.bid,
+            kleur = b.Kleur.ToLower(),
+            titel = b.Titel,
+            foto = Url.Content($"~/images/Bakjes/{b.Kleur.ToLower()}/{b.Foto}")
+        })));
+
+        function renderItems() {
+            const selectedColor = $("#kleurSort").val();
+            const query = $("#searchInput").val().toLowerCase();
+
+            const filtered = bakjesData.filter(b =>
+                (selectedColor === "" || b.kleur === selectedColor) &&
+                b.titel.toLowerCase().includes(query)
+            );
+
+            $("#bakjes").empty();
+            filtered.forEach(b => {
+                const html = `
+                    <div class="photoItem" data-id="${b.id}" data-kleur="${b.kleur}"
+                         style="cursor:move; border:2px solid ${kleurMap[b.kleur] || "#ccc"}; padding:4px; font-size: 0.8em; text-align: center; background:white; border-radius:5px; min-width: 130px; max-width:130px; transition:transform 0.12s ease, box-shadow 0.12s ease;">
+                        <div style="margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${b.titel}</div>
+                        <img src="${b.foto}" alt="${b.titel}"
+                             style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:4px;" />
+                    </div>`;
+                $("#bakjes").append(html);
+            });
+
+            initSortable();
+        }
+
+        function addExtras($item) {
+            const kleur = $item.data("kleur");
+            $item.css("border", `2px solid ${kleur}`);
+            $item.css("position", "relative");
+
+            const $samenwerkBtn = $('<button style="margin-top:6px; font-size:11px; background:#007bff; color:white; border:none; border-radius:4px; padding:3px 6px; cursor:pointer; width:100%;">➕ samenwerken</button>');
+            $samenwerkBtn.on("click", () => openSamenwerkingPopup($item));
+
+            $item.append($samenwerkBtn);
+        }
+
+        function initSortable() {
+            $(".connectedSortable").sortable({
+                connectWith: ".connectedSortable",
+                placeholder: "sortable-placeholder",
+                forcePlaceholderSize: true,
+                scroll: false,
+                helper: (e, item) => item.clone().css({ width: item.width(), opacity: 0.9 }),
+                start: (e, ui) => {
+                    ui.item.css({
+                        "max-width": "110px",
+                        "height": "auto"
+                    });
+                },
+                        receive: function (event, ui) {
+        if (ui.sender && ui.sender.attr("id") === "bakjes") {
+            const kleur = ui.item.data("kleur");
+            const id = ui.item.data("id");
+
+            const bakje = bakjesData.find(b => b.id === id);
+            if (!bakje) return;
+
+            const $newItem = $(`
+                <div class="photoItem" data-id="${bakje.id}" data-kleur="${bakje.kleur}"
+                     style="cursor:move; border:2px solid ${kleurMap[bakje.kleur] || "#ccc"}; padding:4px; font-size: 0.8em; text-align: center; background:white; border-radius:5px; min-width: 130px; max-width:130px; transition:transform 0.12s ease, box-shadow 0.12s ease;">
+                    <div style="margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${bakje.titel}</div>
+                    <img src="${bakje.foto}" alt="${bakje.titel}"
+                         style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:4px;" />
+                </div>
+            `);
+
+            ui.item.after($newItem);
+            $(ui.sender).sortable("cancel");
+            addExtras($newItem);
+            initSortable();
+        }
+    }
+
+
+            }).disableSelection();
+        }
+    const bestaandePlanning = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        Model.Dagindelingen.Select(d => new
+        {
+            id = d.bid,
+            kleur = d.kleur.ToLower(),
+            titel = d.bakje?.Titel ?? "",
+            foto = Url.Content($"~/images/Bakjes/{d.kleur.ToLower()}/{d.bakje?.Foto}"),
+            samenwerkers = new[] { d.sid, d.sid2 }.Where(x => x.HasValue).Select(x => x.Value.ToString()).ToArray()
+        })
+    ));
+
+    bestaandePlanning.forEach(t => {
+            const $taak = $(`
+        <div class="photoItem" data-id="${t.id}" data-kleur="${t.kleur}"
+             style="cursor:move; border:2px solid ${kleurMap[t.kleur] || "#ccc"}; padding:4px; font-size: 0.8em; text-align: center; background:white; border-radius:5px; min-width: 130px; max-width:130px; transition:transform 0.12s ease, box-shadow 0.12s ease;">
+            <div style="margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${t.titel}</div>
+            <img src="${t.foto}" alt="${t.titel}"
+                 style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:4px;" />
+        </div>
+    `);
+        if (t.samenwerkers.length > 0) {
+            $taak.data("samenwerkers", t.samenwerkers);
+            $taak.append(`<div class="partnerLabel" style="margin-top:4px; font-size:11px; color:#333;">🤝 ${t.samenwerkers.length} samenwerker(s)</div>`);
+        }
+        $("#planningTimeline").append($taak);
+        addExtras($taak);
+    });
+
+
+        $(document).on("dblclick", "#planningTimeline .photoItem", function () {
+            $(this).remove();
+        });
+
+        $(document).on("dblclick", "#bakjes .photoItem", function () {
+            const $clone = $(this).clone();
+            $("#planningTimeline").append($clone);
+            addExtras($clone);
+            initSortable();
+        });
+
+        $("#kleurSort, #searchInput").on("change keyup", renderItems);
+
+        $("form").on("submit", function () {
+        const ids = [];
+        $("#planningTimeline .photoItem").each(function () {
+            ids.push($(this).data("id"));
+        });
+        $("#volgordeInput").val(ids.join(","));
+
+        $("input[name^='Samenwerkers']").remove();
+
+        $("#planningTimeline .photoItem").each(function (index) {
+            const taakId = $(this).data("id");
+            const samenwerkers = $(this).data("samenwerkers") || [];
+
+            if (samenwerkers.length > 0) {
+                $("<input>").attr({
+                    type: "hidden",
+                    name: `Samenwerkers[${taakId}_${index}]`,
+                    value: samenwerkers.join(",")
+                }).appendTo("form");
+            }
+        });
+    });
+        renderItems();
+    };
+</script>
+
+
+
+
+

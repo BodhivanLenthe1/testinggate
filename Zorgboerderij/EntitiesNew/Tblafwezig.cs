@@ -7,7 +7,7 @@ public partial class Tblafwezig
 {
     public int Afid { get; set; }
 
-    public int? Clientid { get; set; }
+    public int? clientId { get; set; }
 
     public DateTime? Datum { get; set; }
 

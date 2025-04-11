@@ -1,69 +1,27 @@
-﻿@model IEnumerable<Zorgboerderij.Entities.Bezettingen>
-
+﻿@model IEnumerable<string>
 @{
-    ViewData["Title"] = "Index";
+    ViewBag.Title = "Selecteer een dag";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Selecteer een dag</h2>
+        <p class="text-muted">Klik op een dag om de bezetting te bekijken</p>
+    </div>
 
-<h1>Overzicht afmeldingen</h1>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Client)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Maandag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Dinsdag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Woensdag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Donderdag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Vrijdag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Zaterdag)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Totaal)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+    <div class="row justify-content-center">
+        @foreach (var dag in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Client)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Maandag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Dinsdag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Woensdag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Donderdag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Vrijdag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Zaterdag)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Totaal)
-                </td>
-            </tr>
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-3 d-flex justify-content-center">
+                <a asp-controller="Bezettingen" asp-action="Dagbezetting" asp-route-dag="@dag" style="text-decoration:none; width:100%;">
+                    <div class="card h-100 text-center shadow-sm" style="border:2px solid black; border-radius:0.5rem; padding:0.5rem; min-width: 210px; transition: transform 0.2s, background-color 0.2s;"
+                         onmouseover="this.style.backgroundColor='#E0EEFD';" onmouseout="this.style.backgroundColor='white';">
+                        <div style="color:black; font-weight:bold; font-size:1rem;">
+                            @dag
+                        </div>
+                    </div>
+                </a>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+</div>

@@ -7,7 +7,7 @@ public partial class Tbldp
 {
     public int Dpid { get; set; }
 
-    public int? Clientid { get; set; }
+    public int? clientId { get; set; }
 
     public string? Dagid { get; set; }
 
