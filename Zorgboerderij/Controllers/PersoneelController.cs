@@ -53,16 +53,37 @@ namespace Zorgboerderij.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Groepskleur")] Personeel personeel)
+        public async Task<IActionResult> Create([Bind("Voornaam,Achternaam,Groepskleur")] Personeel personeel, IFormFile Foto)
         {
-            if (ModelState.IsValid)
+            personeel.Maandag = Request.Form["Maandag"];
+            personeel.Dinsdag = Request.Form["Dinsdag"];
+            personeel.Woensdag = Request.Form["Woensdag"];
+            personeel.Donderdag = Request.Form["Donderdag"];
+            personeel.Vrijdag = Request.Form["Vrijdag"];
+            personeel.Zaterdag = Request.Form["Zaterdag"];
+
+            if (Foto != null && Foto.Length > 0)
             {
-                _context.Add(personeel);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/personeel");
+                Directory.CreateDirectory(uploadsFolder);
+
+                string uniqueFileName = Guid.NewGuid() + "_" + Foto.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await Foto.CopyToAsync(stream);
+                }
+
+                personeel.FotoFile = uniqueFileName;
             }
-            return View(personeel);
+
+            _context.Add(personeel);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Personeel/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -85,35 +106,64 @@ namespace Zorgboerderij.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Groepskleur")] Personeel personeel)
+        public async Task<IActionResult> Edit(int id, [Bind("persid,Voornaam,Achternaam,FotoFile,Maandag,Dinsdag,Woensdag,Donderdag,Vrijdag,Zaterdag,Groepskleur")] Personeel personeel, IFormFile Foto)
         {
             if (id != personeel.persid)
-            {
                 return NotFound();
-            }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                var existing = await _context.personeel.FindAsync(id);
+                if (existing == null)
+                    return NotFound();
+
+                // Verwijder oude foto bij nieuwe upload
+                if (Foto != null && Foto.Length > 0)
                 {
-                    _context.Update(personeel);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PersoneelExists(personeel.persid))
+                    if (!string.IsNullOrEmpty(existing.FotoFile))
                     {
-                        return NotFound();
+                        var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/personeel", existing.FotoFile);
+                        if (System.IO.File.Exists(oldPath))
+                            System.IO.File.Delete(oldPath);
                     }
-                    else
+
+                    string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/personeel");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = Guid.NewGuid() + "_" + Foto.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        throw;
+                        await Foto.CopyToAsync(stream);
                     }
+
+                    existing.FotoFile = uniqueFileName;
                 }
+
+                // Update velden
+                existing.Voornaam = personeel.Voornaam;
+                existing.Achternaam = personeel.Achternaam;
+                existing.Maandag = personeel.Maandag;
+                existing.Dinsdag = personeel.Dinsdag;
+                existing.Woensdag = personeel.Woensdag;
+                existing.Donderdag = personeel.Donderdag;
+                existing.Vrijdag = personeel.Vrijdag;
+                existing.Zaterdag = personeel.Zaterdag;
+                existing.Groepskleur = personeel.Groepskleur;
+
+                _context.Update(existing);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(personeel);
+            catch (Exception ex)
+            {
+                Console.WriteLine("Fout bij Edit Personeel: " + ex.Message);
+                return View(personeel);
+            }
         }
+
 
         // GET: Personeel/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -141,12 +191,20 @@ namespace Zorgboerderij.Controllers
             var personeel = await _context.personeel.FindAsync(id);
             if (personeel != null)
             {
+                if (!string.IsNullOrEmpty(personeel.FotoFile))
+                {
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/personeel", personeel.FotoFile);
+                    if (System.IO.File.Exists(path))
+                        System.IO.File.Delete(path);
+                }
+
                 _context.personeel.Remove(personeel);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool PersoneelExists(int id)
         {

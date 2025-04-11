@@ -1,0 +1,71 @@
+﻿@functions {
+    public string KleurCss(string kleur)
+    {
+        return kleur.ToLower() switch
+        {
+            "rood" => "red",
+            "geel" => "yellow",
+            "blauw" => "blue",
+            _ => "gray"
+        };
+    }
+}
+
+@model IEnumerable<Zorgboerderij.Entities.Clienten>
+
+@{
+    var personeel = ViewBag.Personeel as List<Zorgboerderij.Entities.Personeel>;
+    string dag = ViewBag.Dag;
+    ViewData["Title"] = $"Aanwezig op {dag}";
+}
+
+<div class="container mt-5">
+    <div class="mb-5">
+        <div class="text-center mb-3">
+            <h4 class="fw-semibold">Personeel</h4>
+        </div>
+        <div class="row justify-content-center">
+            @foreach (var p in personeel)
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-6 d-flex justify-content-center mb-4">
+                    <div class="card shadow-sm" style="width: 100%; border: 3px solid @KleurCss(p.Groepskleur);">
+                        <img src="@Url.Content($"~/images/personeel/{p.FotoFile}")"
+                             class="card-img-top"
+                             alt="@p.Voornaam @p.Achternaam"
+                             style="object-fit: cover; height: 140px;">
+                        <div class="card-body text-center p-2" style="font-size: 0.85rem;">
+                            <h6 class="card-title mb-0" style="color: black;">
+                                @p.Voornaam @p.Achternaam
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="mb-5">
+        <div class="text-center mb-3">
+            <h4 class="fw-semibold">Cliënten</h4>
+        </div>
+        <div class="row justify-content-center">
+            @foreach (var c in Model)
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-6 d-flex justify-content-center mb-4">
+                    <a href="@Url.Action("Client", "Dagindeling", new { id = c.persid, dag = ViewBag.DebugDag })" style="text-decoration: none; width: 100%;">
+                        <div class="card shadow-sm" style="width: 100%; border: 3px solid @KleurCss(c.Groepskleur); transition: transform 0.2s;">
+                            <img src="@Url.Content($"~/images/clienten/{c.FotoFile}")"
+                                 class="card-img-top"
+                                 alt="@c.Voornaam @c.Achternaam"
+                                 style="object-fit: cover; height: 140px;">
+                            <div class="card-body text-center p-2" style="font-size: 0.85rem;">
+                                <h6 class="card-title mb-0" style="color: black;">
+                                    @c.Voornaam @c.Achternaam
+                                </h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

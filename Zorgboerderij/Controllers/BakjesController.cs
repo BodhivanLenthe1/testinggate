@@ -132,7 +132,7 @@ namespace Zorgboerderij.Controllers
 
         public IActionResult TijdenIndex()
         {
-            var filteredBakjes = _context.bakjes.Where(b => b.Kleur == "Roze").ToList();
+            var filteredBakjes = _context.bakjes.Where(b => b.Kleur == "Bruin").ToList();
 
             return View(filteredBakjes);
         }

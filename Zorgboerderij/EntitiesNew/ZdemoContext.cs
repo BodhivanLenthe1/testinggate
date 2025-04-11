@@ -48,13 +48,13 @@ public partial class ZdemoContext : DbContext
 
             entity.Property(e => e.Afid).HasColumnName("afid");
             entity.Property(e => e.Afsoort).HasColumnName("afsoort");
-            entity.Property(e => e.Clientid).HasColumnName("clientid");
+            entity.Property(e => e.clientId).HasColumnName("clientid");
             entity.Property(e => e.Datum)
                 .HasColumnType("datetime")
                 .HasColumnName("datum");
 
             entity.HasOne(d => d.Client).WithMany(p => p.Tblafwezigs)
-                .HasForeignKey(d => d.Clientid)
+                .HasForeignKey(d => d.clientId)
                 .HasConstraintName("FK__tblafwezi__clien__5FB337D6");
         });
 
@@ -78,11 +78,11 @@ public partial class ZdemoContext : DbContext
 
         modelBuilder.Entity<Tblclienten>(entity =>
         {
-            entity.HasKey(e => e.Clientid).HasName("PK__tblclien__819DC769CB1967BD");
+            entity.HasKey(e => e.clientId).HasName("PK__tblclien__819DC769CB1967BD");
 
             entity.ToTable("tblclienten");
 
-            entity.Property(e => e.Clientid).HasColumnName("clientid");
+            entity.Property(e => e.clientId).HasColumnName("clientid");
             entity.Property(e => e.Achternaam)
                 .HasMaxLength(100)
                 .IsFixedLength()
@@ -130,7 +130,7 @@ public partial class ZdemoContext : DbContext
 
             entity.Property(e => e.Dpid).HasColumnName("dpid");
             entity.Property(e => e.Bid).HasColumnName("bid");
-            entity.Property(e => e.Clientid).HasColumnName("clientid");
+            entity.Property(e => e.clientId).HasColumnName("clientid");
             entity.Property(e => e.Dagid)
                 .HasMaxLength(50)
                 .HasColumnName("dagid");
@@ -150,7 +150,7 @@ public partial class ZdemoContext : DbContext
                 .HasConstraintName("FK__tbldp__bid__6383C8BA");
 
             entity.HasOne(d => d.Client).WithMany(p => p.Tbldps)
-                .HasForeignKey(d => d.Clientid)
+                .HasForeignKey(d => d.clientId)
                 .HasConstraintName("FK__tbldp__clientid__628FA481");
         });
 

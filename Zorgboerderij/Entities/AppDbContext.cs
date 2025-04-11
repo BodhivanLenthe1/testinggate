@@ -17,11 +17,16 @@ namespace Zorgboerderij.Entities
         public DbSet<Personeel> personeel { get; set; }
         public DbSet<Clienten> clienten { get; set; }
         public DbSet<Bakjes> bakjes { get; set; }
+        public DbSet<Dagindeling> Dagindelingen { get; set; }
+
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<Zorgboerderij.Entities.Bezettingen> Bezettingen { get; set; } = default!;
+
     }
+
 }

@@ -6,7 +6,7 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-md-5">
-        <form asp-controller="Clienten" asp-action="Create" method="post" class="p-3 rounded shadow">
+        <form asp-controller="Clienten" asp-action="Create" method="post" enctype="multipart/form-data" class="p-3 rounded shadow">
             <h4 class="text-center mb-2">@ViewData["Title"]</h4>
 
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
@@ -23,14 +23,8 @@
             </div>
 
             <div class="mb-2">
-                <label asp-for="FotoFile" class="form-label fw-bold"></label>
-                <select class="form-select form-select-sm" asp-for="FotoFile">
-                    <option value="" selected disabled>Kies een foto</option>
-                    <option value="Davy.jpg">Davy</option>
-                    <option value="Eric S.jpg">Eric</option>
-                    <option value="Walter.jpg">Walter</option>
-                    <option value="Qutaiba.jpg">Qutaiba</option>
-                </select>
+                <label class="form-label fw-bold">Upload een foto</label>
+                <input type="file" name="Foto" class="form-control form-control-sm" accept="image/*" />
             </div>
 
             @foreach (var dag in new[] { "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag" })
@@ -57,6 +51,7 @@
                     </div>
                 </div>
             }
+
             <div class="mb-2">
                 <label asp-for="Groepskleur" class="form-label fw-bold"></label>
                 <select class="form-select form-select-sm" asp-for="Groepskleur">
@@ -74,20 +69,3 @@
     </div>
 </div>
 
-<script>
-    document.querySelectorAll("input[type=radio][name$='-Status']").forEach(function (radio) {
-        radio.addEventListener("change", function () {
-            var dag = this.name.split("-")[0];
-            var tijdOptions = document.getElementById(dag + "-TimeOptions");
-            var hiddenInput = document.getElementById(dag);
-
-            if (this.value === "Aanwezig") {
-                tijdOptions.classList.remove('d-none');
-                hiddenInput.value = "Aanwezig";
-            } else {
-                tijdOptions.classList.add('d-none');
-                hiddenInput.value = "Afwezig";
-            }
-        });
-    });
-</script>

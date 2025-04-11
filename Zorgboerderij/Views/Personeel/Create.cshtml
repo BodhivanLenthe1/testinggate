@@ -6,7 +6,7 @@
 
 <div class="d-flex justify-content-center">
     <div class="col-md-5">
-        <form asp-action="Create" method="post" class="p-3 rounded shadow">
+        <form asp-controller="Personeel" asp-action="Create" method="post" enctype="multipart/form-data" class="p-3 rounded shadow">
             <h4 class="text-center mb-2">@ViewData["Title"]</h4>
 
             <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
@@ -15,67 +15,16 @@
                 <div class="col">
                     <label asp-for="Voornaam" class="form-label fw-bold"></label>
                     <input asp-for="Voornaam" class="form-control form-control-sm" required />
-                    <span asp-validation-for="Voornaam" class="text-danger"></span>
                 </div>
                 <div class="col">
-                    <label asp-for="Achternaam" class="form-labe fw-bold"></label>
+                    <label asp-for="Achternaam" class="form-label fw-bold"></label>
                     <input asp-for="Achternaam" class="form-control form-control-sm" required />
-                    <span asp-validation-for="Achternaam" class="text-danger"></span>
                 </div>
             </div>
+
             <div class="mb-2">
-                <label asp-for="FotoFile" class="form-label fw-bold"></label>
-                <select class="form-select form-select-sm" asp-for="FotoFile">
-                    <option value="" selected disabled>Kies een foto</option>
-                    <option value="Anne.jpg">Anne</option>
-                    <option value="Anouk.jpg">Anouk</option>
-                    <option value="Ben.jpg">Ben</option>
-                    <option value="Björn stage.jpg">Björn</option>
-                    <option value="Boel.jpg">Boel</option>
-                    <option value="Charlotte.jpg">Charlotte</option>
-                    <option value="Cilia Huuskes Stage.jpg">Cilia</option>
-                    <option value="Cor.jpg">Cor</option>
-                    <option value="Desiree stage.jpg">Desiree</option>
-                    <option value="Diana stage.jpg">Diana</option>
-                    <option value="Dunja stage.jpg">Dunja</option>
-                    <option value="Dylan.jpg">Dylan</option>
-                    <option value="Eline stage.jpg">Eline</option>
-                    <option value="Elke.jpg">Elke</option>
-                    <option value="Femke D.jpg">Femke</option>
-                    <option value="Harrie.jpg">Harrie</option>
-                    <option value="Helma.jpg">Helma</option>
-                    <option value="Huis.jpg">Huis</option>
-                    <option value="Ingrid N.jpg">Ingrid N</option>
-                    <option value="Ingrid.jpg">Ingrid</option>
-                    <option value="Jan-Willem.jpg">Jan-Willem</option>
-                    <option value="Jeroen.jpg">Jeroen</option>
-                    <option value="Jessica.jpg">Jessica</option>
-                    <option value="Joëlle.jpg">Joëlle</option>
-                    <option value="Joost Alofs Stage.jpg">Joost</option>
-                    <option value="Jose.jpg">Jose</option>
-                    <option value="Koen v. S..jpg">Koen</option>
-                    <option value="Linda.jpg">Linda</option>
-                    <option value="Lonneke.jpg">Lonneke</option>
-                    <option value="Louis.jpg">Louis</option>
-                    <option value="Luka.jpg">Luka</option>
-                    <option value="Mariska.jpg">Mariska</option>
-                    <option value="Marjo.jpg">Marjo</option>
-                    <option value="Maury.jpg">Maury</option>
-                    <option value="Meghan.jpg">Meghan</option>
-                    <option value="Merel stage.jpg">Merel</option>
-                    <option value="Mitchel.jpg">Mitchel</option>
-                    <option value="Nina.jpg">Nina</option>
-                    <option value="Nout.jpg">Nout</option>
-                    <option value="Sanne Evers.jpg">Sanne</option>
-                    <option value="Sebastian stage.jpg">Sebastian</option>
-                    <option value="Siebren.jpg">Siebren</option>
-                    <option value="Suzan stage.jpg">Suzan</option>
-                    <option value="Theo.jpg">Theo</option>
-                    <option value="Toon.jpg">Toon</option>
-                    <option value="Trout.jpg">Trout</option>
-                    <option value="Veronique.jpg">Veronique</option>
-                </select>
-                <span asp-validation-for="FotoFile" class="text-danger"></span>
+                <label class="form-label fw-bold">Upload een foto</label>
+                <input type="file" name="Foto" class="form-control form-control-sm" accept="image/*" />
             </div>
 
             @foreach (var dag in new[] { "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag" })
@@ -106,22 +55,16 @@
             <div class="mb-2">
                 <label asp-for="Groepskleur" class="form-label fw-bold"></label>
                 <select class="form-select form-select-sm" asp-for="Groepskleur">
-                    <option value="1">Rood</option>
-                    <option value="2">Blauw</option>
+                    <option value="Geel">Geel</option>
+                    <option value="Rood">Rood</option>
+                    <option value="Blauw">Blauw</option>
                 </select>
-                <span asp-validation-for="Groepskleur" class="text-danger"></span>
             </div>
 
             <div class="mt-2 text-center">
-                <button type="submit" class="btn btn-success btn-sm w-100">Collega aanmaken</button>
+                <button type="submit" class="btn btn-success btn-sm w-100">Opslaan</button>
                 <a asp-action="Index" class="btn btn-outline-secondary btn-sm mt-2 w-100">Terug</a>
             </div>
         </form>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
