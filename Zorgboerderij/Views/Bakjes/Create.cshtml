@@ -4,43 +4,171 @@
     ViewData["Title"] = "Create";
 }
 
-<div class="d-flex justify-content-center">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Foto" class="control-label"></label>
-                <input asp-for="Foto" class="form-control" type="file"/>
-                <span asp-validation-for="Foto" class="text-danger"></span>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg border-0 rounded-3" style="width: 100%; display: flex; flex-direction: column;">
+            <div class="card-header text-center py-3" id="cardHeader">
+                <h4 class="mb-0" id="pageTitle">Nieuwe Bakje Aanmaken</h4>
             </div>
-            <div class="form-group">
-                <label asp-for="Titel" class="control-label"></label>
-                <input asp-for="Titel" class="form-control" />
-                <span asp-validation-for="Titel" class="text-danger"></span>
+            <div class="card-body p-4 flex-grow-1">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Foto" class="form-label">Foto</label>
+                        <input asp-for="Foto" class="form-control" type="file" />
+                        <span asp-validation-for="Foto" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Titel" class="form-label">Titel</label>
+                        <input asp-for="Titel" class="form-control" />
+                        <span asp-validation-for="Titel" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3 d-none">
+                        <label asp-for="Kleur" class="form-label">Kleur</label>
+                        <select class="form-select" asp-for="Kleur" id="kleurSelect" onchange="updateButtonColor()">
+                            <option value="Blauw">Dieren</option>
+                            <option value="Paars">Verzorgen</option>
+                            <option value="Groen">Tuin</option>
+                            <option value="Oranje">Land</option>
+                            <option value="Roze">Tijden</option>
+                            <option value="Geel">Corvee</option>
+                            <option value="Rood">Creatief</option>
+                            <option value="Grijs">Schuur</option>
+                            <option value="Zwart">Klussen</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <input type="submit" value="Create" class="btn w-100" id="submitButton" />
+                    </div>
+
+                    <p class="text-center mb-0">
+                        <a href="javascript:history.back()" class="nav-link text-dark">Terug</a>
+                    </p>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="Kleur" class="control-label"></label>
-                <select class="form-select" asp-for="Kleur">
-                    <option value="Blauw">Dieren</option>
-                    <option value="Paars">Verzorgen</option>
-                    <option value="Groen">Tuin</option>
-                    <option value="Oranje">Land</option>
-                    <option value="Bruin">Tijden</option>
-                    <option value="Geel">Corvee</option>
-                    <option value="Rood">Creatief</option>
-                    <option value="Grijs">Schuur</option>
-                    <option value="Zwart">Klussen</option>
-                </select>
-                <span asp-validation-for="Kleur" class="text-danger"></span>
-            </div>
-            <div class="form-group mt-2">
-                <input type="submit" value="Create" class="btn btn-primary w-100 mb-2" />
-                <p class="text-center"><a href="javascript:history.back()" class="nav-link text-dark">Terug</a></p>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function setColorFromReferrer() {
+            var referrer = document.referrer.toLowerCase();
+            var kleurSelect = document.getElementById("kleurSelect");
+
+            if (referrer.includes("dieren")) kleurSelect.value = "Blauw";
+            else if (referrer.includes("verzorgen")) kleurSelect.value = "Paars";
+            else if (referrer.includes("tuin")) kleurSelect.value = "Groen";
+            else if (referrer.includes("land")) kleurSelect.value = "Oranje";
+            else if (referrer.includes("tijden")) kleurSelect.value = "Roze";
+            else if (referrer.includes("corvee")) kleurSelect.value = "Geel";
+            else if (referrer.includes("creatief")) kleurSelect.value = "Rood";
+            else if (referrer.includes("schuur")) kleurSelect.value = "Grijs";
+            else if (referrer.includes("klussen")) kleurSelect.value = "Zwart";
+            else kleurSelect.value = "Blauw"; // fallback
+
+            updateButtonColor(); // Kleur toepassen
+        }
+
+        function updateButtonColor() {
+            var kleur = document.getElementById("kleurSelect").value;
+            var submitButton = document.getElementById("submitButton");
+            var pageTitle = document.getElementById("pageTitle");
+            var cardHeader = document.getElementById("cardHeader");
+
+            switch (kleur) {
+                case "Blauw":
+                    submitButton.className = "btn btn-primary w-100";
+                    pageTitle.innerText = "Nieuwe Bakje - Dieren";
+                    cardHeader.style.backgroundColor = "#007bff";
+                    pageTitle.style.color = "white";
+                    break;
+                case "Paars":
+                    submitButton.className = "btn btn-purple w-100";
+                    pageTitle.innerText = "Nieuwe Bakje - Verzorgen";
+                    cardHeader.style.backgroundColor = "#6f42c1";
+                    pageTitle.style.color = "white";
+                    break;
+                case "Groen":
+                    submitButton.className = "btn btn-success w-100";
+                    pageTitle.innerText = "Nieuwe Bakje - Tuin";
+                    cardHeader.style.backgroundColor = "#28a745";
+                    pageTitle.style.color = "white";
+                    break;
+                case "Oranje":
+                    submitButton.className = "btn btn-warning w-100";
+                    pageTitle.innerText = "Nieuwe Bakje - Land";
+                    cardHeader.style.backgroundColor = "#ffc107";
+                    pageTitle.style.color = "white";
+                    break;
+                case "Roze":
+                    submitButton.className = "btn btn-pink w-100";
+                    pageTitle.innerText = "Nieuwe Bakje - Tijden";
+                    cardHeader.style.backgroundColor = "#e83e8c";
+                    pageTitle.style.color = "white";
+                    break;
+                case "Geel":
+                    submitButton.className = "btn btn-warning w-100";
+                    pageTitle.innerText = "Nieuwe Bakje - Corvee";
+                    cardHeader.style.backgroundColor = "#ffcc00";
+                    pageTitle.style.color = "white";
+                    break;
+                case "Rood":
+                    submitButton.className = "btn btn-danger w-100";
+                    pageTitle.innerText = "Nieuwe Bakje - Creatief";
+                    cardHeader.style.backgroundColor = "#dc3545";
+                    pageTitle.style.color = "white";
+                    break;
+                case "Grijs":
+                    submitButton.className = "btn btn-secondary w-100";
+                    pageTitle.innerText = "Nieuwe Bakje - Schuur";
+                    cardHeader.style.backgroundColor = "#6c757d";
+                    pageTitle.style.color = "white";
+                    break;
+                case "Zwart":
+                    submitButton.className = "btn btn-dark w-100";
+                    pageTitle.innerText = "Nieuwe Bakje - Klussen";
+                    cardHeader.style.backgroundColor = "#343a40";
+                    pageTitle.style.color = "white";
+                    break;
+                default:
+                    submitButton.className = "btn btn-primary w-100";
+                    pageTitle.innerText = "Nieuwe Bakje Aanmaken";
+                    cardHeader.style.backgroundColor = "#007bff";
+                    pageTitle.style.color = "white";
+            }
+        }
+
+        window.onload = function () {
+            setColorFromReferrer();
+        };
+    </script>
+
+    <style>
+        .btn-purple {
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+        }
+
+            .btn-purple:hover {
+                background-color: #5a2e8f;
+                border-color: #5a2e8f;
+            }
+
+        .btn-pink {
+            background-color: #e83e8c;
+            border-color: #e83e8c;
+        }
+
+            .btn-pink:hover {
+                background-color: #d6336c;
+                border-color: #d6336c;
+            }
+    </style>
 }
