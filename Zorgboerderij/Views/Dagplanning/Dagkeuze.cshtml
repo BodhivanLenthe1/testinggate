@@ -1,0 +1,160 @@
+﻿@using Microsoft.AspNetCore.Http
+@functions {
+    public string KleurCss(string kleur)
+    {
+        return kleur.ToLower() switch
+        {
+            "rood" => "red",
+            "geel" => "yellow",
+            "blauw" => "blue",
+            _ => "gray"
+        };
+    }
+}
+
+@{
+    Layout = "_Layout";
+}
+@model IEnumerable<Zorgboerderij.Entities.Clienten>
+@{
+    var personeel = ViewBag.Personeel as List<Zorgboerderij.Entities.Personeel>;
+    string dag = ViewBag.Dag as string;
+    ViewData["Title"] = $"Aanwezig op {dag}";
+}
+<button id="aanpassenKnop"
+        style="position: fixed; bottom: 15px; right: 15px; opacity: 0; transition: opacity 0.3s;
+               z-index: 9999; background-color: #007bff; color: white; border: none;
+               border-radius: 6px; padding: 6px 10px; font-size: 0.8rem;
+               font-weight: 500; cursor: pointer;">
+    ✏️ Aanpassen
+</button>
+<div class="container mt-5">
+    <div class="mb-5">
+        <div class="text-center mb-3">
+            <h4 class="fw-semibold">Personeel</h4>
+        </div>
+        <div class="row justify-content-center">
+            @foreach (var p in personeel)
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-6 d-flex justify-content-center mb-4">
+                    <div class="card shadow-sm" style="width:100%; border:3px solid @KleurCss(p.Groepskleur);">
+                        <img src="@Url.Content($"~/images/personeel/{p.FotoFile}")"
+                             class="card-img-top" alt="@p.Voornaam @p.Achternaam"
+                             style="object-fit:cover;height:140px;" />
+                        <div class="card-body text-center p-2" style="font-size:0.85rem;">
+                            <h6 class="card-title mb-0">@p.Voornaam @p.Achternaam</h6>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <div class="mb-5">
+        <div class="text-center mb-3">
+            <h4 class="fw-semibold">Cliënten</h4>
+        </div>
+        <div class="row justify-content-center">
+            @foreach (var c in Model)
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-6 d-flex justify-content-center mb-4">
+                    <div class="card shadow-sm client-card"
+                         data-id="@c.persid"
+                         style="width:100%; border:3px solid @KleurCss(c.Groepskleur); cursor:pointer;">
+                        <img src="@Url.Content($"~/images/clienten/{c.FotoFile}")"
+                             class="card-img-top" alt="@c.Voornaam @c.Achternaam"
+                             style="object-fit:cover;height:140px;" />
+                        <div class="card-body text-center p-2" style="font-size:0.85rem;">
+                            <h6 class="card-title mb-0">@c.Voornaam @c.Achternaam</h6>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function(){
+          let aanpassenModus = false, hoverTimer;
+          const knop = document.getElementById('aanpassenKnop');
+
+          document.body.addEventListener('mousemove', e=>{
+            const inZone = e.clientX > window.innerWidth-120 && e.clientY > window.innerHeight-120;
+            if(inZone && !hoverTimer) {
+              hoverTimer = setTimeout(()=> knop.style.opacity = 1,2000);
+            }
+            if(!inZone){
+              clearTimeout(hoverTimer);
+              hoverTimer = null;
+              knop.style.opacity = 0;
+            }
+          });
+
+          knop.addEventListener('click', ()=>{
+            aanpassenModus = !aanpassenModus;
+            knop.style.backgroundColor = aanpassenModus?'#28a745':'#007bff';
+            knop.textContent = aanpassenModus?'✅ Aanpassen actief':'✏️ Aanpassen';
+            sessionStorage.setItem('aanpassenModus', aanpassenModus);
+          });
+
+          window.addEventListener('load', ()=>{
+            if(sessionStorage.getItem('aanpassenModus')==='true'){
+              knop.style.backgroundColor = '#28a745';
+              knop.textContent = '✅ Aanpassen actief';
+              aanpassenModus = true;
+            }
+          });
+
+          document.querySelectorAll('.client-card').forEach(card=>{
+            card.addEventListener('click',()=>{
+              const id = card.dataset.id;
+              const dag = '@dag';
+              const baseUrl = sessionStorage.getItem('aanpassenModus')==='true'
+                ? '/Dagplanning/Bewerken'
+                : '/Dagindeling/Client';
+              window.location.href = `${baseUrl}?id=${id}&dag=${encodeURIComponent(dag)}`;
+            });
+          });
+        })();
+
+        (function(){
+          const modalEl = document.getElementById('dagcodeModal');
+          const homeLink = document.querySelector('a[asp-controller="Home"][asp-action="Index"]');
+          if(!homeLink) return;
+          const modal = new bootstrap.Modal(modalEl);
+
+          homeLink.addEventListener('click', e=>{
+            e.preventDefault();
+            document.getElementById('foutMsg').style.display = 'none';
+            modal.show();
+          });
+
+          document.getElementById('loginBtn').addEventListener('click', ()=>{
+            const dag = document.getElementById('inputDag').value;
+            const ww  = document.getElementById('inputWw').value;
+            fetch('@Url.Action("CheckDagcode", "Dagplanning")',{
+              method:'POST',
+              headers:{'Content-Type':'application/x-www-form-urlencoded'},
+              body:`gebruikersnaam=${encodeURIComponent(dag)}&wachtwoord=${encodeURIComponent(ww)}`
+            })
+            .then(r=>r.json())
+            .then(json=>{
+              if(json.success){
+                fetch('@Url.Action("DagcodeLogin", "Dagplanning")',{
+                  method:'POST',
+                  headers:{'Content-Type':'application/x-www-form-urlencoded'},
+                  body:`dagcode=${encodeURIComponent(dag)}&wachtwoord=${encodeURIComponent(ww)}`
+                }).then(_=> window.location.href = '@Url.Action("Index", "Home")');
+              } else {
+                document.getElementById('foutMsg').style.display = 'block';
+              }
+            });
+          });
+
+          document.getElementById('cancelBtn')
+                  .addEventListener('click',()=> modal.hide());
+        })();
+    </script>
+}
