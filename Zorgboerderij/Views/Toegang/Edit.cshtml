@@ -1,7 +1,7 @@
 ﻿@model Zorgboerderij.Entities.UserAccount
 
 @{
-    ViewData["Title"] = "Gebruiker aanpassen";
+    ViewData["Title"] = "Gebruiker Aanpassen";
 }
 
 <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
@@ -14,7 +14,6 @@
         <div class="card-body">
             <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                <input type="hidden" asp-for="Id" />
 
                 <div class="form-group mb-3">
                     <label asp-for="OrgId" class="form-label"></label>
@@ -52,8 +51,18 @@
                     <span asp-validation-for="Wachtwoord" class="text-danger"></span>
                 </div>
 
+                <div class="form-group mb-3">
+                    <label asp-for="Toegang" class="form-label"></label>
+                    <select asp-for="Toegang" class="form-control">
+                        <option value="">-- Selecteer toegang --</option>
+                        <option value="Admin">Admin</option>
+                        <option value="SuperUser">SuperUser</option>
+                    </select>
+                    <span asp-validation-for="Toegang" class="text-danger"></span>
+                </div>
+
                 <div class="form-group">
-                    <input type="submit" value="Gebruiker Aanpassen" class="btn w-100 mb-2 text-white"
+                    <input type="submit" value="Gebruiker aanmaken" class="btn w-100 mb-2 text-white"
                            style="background: linear-gradient(135deg, #4374b8, #4374b8); border: none;" />
                     <p class="text-center mb-0">
                         <a asp-action="Index" class="nav-link text-dark">Terug</a>
