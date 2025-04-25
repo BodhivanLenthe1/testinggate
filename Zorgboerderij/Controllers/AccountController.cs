@@ -64,29 +64,30 @@ namespace Zorgboerderij.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(LoginVM model)
+        public async Task<IActionResult> Login(LoginVM model)
         {
             if (ModelState.IsValid)
             {
-                // Zoek de gebruiker op basis van gebruikersnaam en OrgId (zonder wachtwoordvergelijking)
                 var user = _context.userAccounts
-                    .Where(x => x.OrgId == model.OrgId && x.Gebruikersnaam == model.Gebruikersnaam)
-                    .FirstOrDefault();
+                    .FirstOrDefault(x => x.OrgId == model.OrgId && x.Gebruikersnaam == model.Gebruikersnaam);
 
-                // Controleer of gebruiker bestaat en wachtwoord correct is met BCrypt
                 if (user != null && BCrypt.Net.BCrypt.Verify(model.Wachtwoord, user.Wachtwoord))
                 {
-                    // Success, Cookie maken
+                    user.LaatstIngelogd = DateTime.Now;
+                    _context.userAccounts.Update(user);
+                    await _context.SaveChangesAsync();
+
                     var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim("Name", user.Voornaam),
-                new Claim(ClaimTypes.Role, "User"),
+                new Claim(ClaimTypes.Role, user.Toegang ?? "User")
             };
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
+                    
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -94,6 +95,7 @@ namespace Zorgboerderij.Controllers
                     ModelState.AddModelError("", "Gebruikersnaam/Wachtwoord zijn incorrect.");
                 }
             }
+
             return View(model);
         }
 

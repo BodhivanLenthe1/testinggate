@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Zorgboerderij.Entities;
-
-// passwords all accounts except bodhis/qutaibas = Test123!
 
 namespace Zorgboerderij.Controllers
 {
@@ -22,59 +20,68 @@ namespace Zorgboerderij.Controllers
         }
 
         [Authorize]
-        // GET: Instellingen
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.userAccounts.ToListAsync());
+            var users = await _context.userAccounts.ToListAsync();
+            var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (currentUserId != null)
+            {
+                foreach (var user in users)
+                {
+                    if (user.Id.ToString() == currentUserId)
+                    {
+                        user.LaatstIngelogd = DateTime.Now;  
+                        _context.Update(user);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    Console.WriteLine($"Gebruiker: {user.Gebruikersnaam}, Laatst ingelogd: {user.LaatstIngelogd}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Geen gebruiker ingelogd.");
+            }
+
+            return View(users);
         }
 
+
         [Authorize]
-        // GET: Instellingen/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var userAccount = await _context.userAccounts
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var userAccount = await _context.userAccounts.FirstOrDefaultAsync(m => m.Id == id);
             if (userAccount == null)
-            {
                 return NotFound();
-            }
 
             return View(userAccount);
         }
 
         [Authorize]
-        // GET: Instellingen/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Instellingen/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,OrgId,Voornaam,Achternaam,Email,Gebruikersnaam,Wachtwoord")] UserAccount userAccount)
+        public async Task<IActionResult> Create([Bind("Id,OrgId,Voornaam,Achternaam,Email,Gebruikersnaam,Wachtwoord,Toegang,LaatstIngelogd")] UserAccount userAccount)
         {
             var existingUser = await _context.userAccounts
                 .FirstOrDefaultAsync(u => u.Email == userAccount.Email || u.Gebruikersnaam == userAccount.Gebruikersnaam);
 
             if (existingUser != null)
-            {
                 ModelState.AddModelError(string.Empty, "Een gebruiker met deze email/gebruikersnaam bestaat al.");
-            }
 
             if (ModelState.IsValid)
             {
-                // Wachtwoord hashen met BCrypt
                 userAccount.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(userAccount.Wachtwoord);
-
                 _context.Add(userAccount);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -83,51 +90,34 @@ namespace Zorgboerderij.Controllers
             return View(userAccount);
         }
 
-
         [Authorize]
-        // GET: Instellingen/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var userAccount = await _context.userAccounts.FindAsync(id);
             if (userAccount == null)
-            {
                 return NotFound();
-            }
+
             return View(userAccount);
         }
 
         [Authorize]
-        // POST: Instellingen/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,OrgId,Voornaam,Achternaam,Email,Gebruikersnaam,Wachtwoord")] UserAccount userAccount)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,OrgId,Voornaam,Achternaam,Email,Gebruikersnaam,Wachtwoord,Toegang,LaatstIngelogd")] UserAccount userAccount)
         {
             if (id != userAccount.Id)
-            {
                 return NotFound();
-            }
 
-            // Zoek de bestaande entiteit
             var existingUser = await _context.userAccounts.FindAsync(id);
             if (existingUser == null)
-            {
                 return NotFound();
-            }
 
-            // Als het wachtwoord gewijzigd is, moet het opnieuw worden gehasht
             if (existingUser.Wachtwoord != userAccount.Wachtwoord)
-            {
                 userAccount.Wachtwoord = BCrypt.Net.BCrypt.HashPassword(userAccount.Wachtwoord);
-            }
 
-            // Markeer de bestaande entiteit als gewijzigd
             _context.Entry(existingUser).CurrentValues.SetValues(userAccount);
 
             try
@@ -137,38 +127,28 @@ namespace Zorgboerderij.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!UserAccountExists(userAccount.Id))
-                {
                     return NotFound();
-                }
                 else
-                {
                     throw;
-                }
             }
 
             return RedirectToAction(nameof(Index));
         }
 
         [Authorize]
-        // GET: Instellingen/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var userAccount = await _context.userAccounts
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (userAccount == null)
-            {
                 return NotFound();
-            }
 
             return View(userAccount);
         }
 
-        // POST: Instellingen/Delete/5
         [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -176,9 +156,7 @@ namespace Zorgboerderij.Controllers
         {
             var userAccount = await _context.userAccounts.FindAsync(id);
             if (userAccount != null)
-            {
                 _context.userAccounts.Remove(userAccount);
-            }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
