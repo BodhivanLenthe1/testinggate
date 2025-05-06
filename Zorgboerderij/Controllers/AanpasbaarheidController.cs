@@ -7,25 +7,18 @@ namespace Zorgboerderij.Controllers
 {
     public class AanpasbaarheidController : Controller
     {
-        private readonly ApplicationDbContext _context;
-
-        public AanpasbaarheidController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
         [HttpGet]
         public IActionResult Index()
         {
-            var aanpasbaarheid = _context.Aanpasbaarheid.FirstOrDefault();
             var model = new AanpasbaarheidViewModel
             {
-                ExistingLogo = aanpasbaarheid?.Logo ?? "/images/LogoBoerderij.png"
+                ExistingLogo = "/images/LogoBoerderij.png"
             };
 
             return View(model);
         }
 
+        [HttpPost]
         [HttpPost]
         public async Task<IActionResult> Index(AanpasbaarheidViewModel model)
         {
@@ -33,8 +26,6 @@ namespace Zorgboerderij.Controllers
             {
                 return View(model);
             }
-
-            var aanpasbaarheid = _context.Aanpasbaarheid.FirstOrDefault() ?? new Aanpasbaarheid();
 
             if (model.LogoFile != null && model.LogoFile.Length > 0)
             {
@@ -51,35 +42,28 @@ namespace Zorgboerderij.Controllers
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
                 var newFilePath = Path.Combine(uploadsFolder, fileName);
 
-                // Oud logo verwijderen
-                if (!string.IsNullOrEmpty(aanpasbaarheid.Logo))
+                if (!string.IsNullOrEmpty(model.ExistingLogo))
                 {
-                    var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", aanpasbaarheid.Logo.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString()));
+                    var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", model.ExistingLogo.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString()));
                     if (System.IO.File.Exists(oldFilePath) && oldFilePath != newFilePath)
                     {
                         System.IO.File.Delete(oldFilePath);
                     }
                 }
 
+                
                 using (var stream = new FileStream(newFilePath, FileMode.Create))
                 {
                     await model.LogoFile.CopyToAsync(stream);
                 }
 
-                aanpasbaarheid.Logo = "/images/" + fileName;
-                model.ExistingLogo = aanpasbaarheid.Logo;
-
-                if (aanpasbaarheid.Id == 0)
-                    _context.Aanpasbaarheid.Add(aanpasbaarheid);
-                else
-                    _context.Aanpasbaarheid.Update(aanpasbaarheid);
-
-                await _context.SaveChangesAsync();
+                model.ExistingLogo = "/images/" + fileName;
             }
 
-            ViewBag.Refresh = true;
+            ViewBag.Refresh = true; 
             TempData["Message"] = "Instellingen opgeslagen!";
             return View(model);
         }
+
     }
 }
