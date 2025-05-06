@@ -71,9 +71,9 @@
             else if (referrer.includes("creatief")) kleurSelect.value = "Rood";
             else if (referrer.includes("schuur")) kleurSelect.value = "Grijs";
             else if (referrer.includes("klussen")) kleurSelect.value = "Zwart";
-            else kleurSelect.value = "Blauw"; // fallback
+            else kleurSelect.value = "Blauw"; 
 
-            updateButtonColor(); // Kleur toepassen
+            updateButtonColor(); 
         }
 
         function updateButtonColor() {
@@ -89,36 +89,38 @@
                     cardHeader.style.backgroundColor = "#007bff";
                     pageTitle.style.color = "white";
                     break;
-                case "Paars":
-                    submitButton.className = "btn btn-purple w-100";
-                    pageTitle.innerText = "Nieuwe Bakje - Verzorgen";
-                    cardHeader.style.backgroundColor = "#6f42c1";
-                    pageTitle.style.color = "white";
-                    break;
+                  case "Paars": 
+        submitButton.className = "btn btn-purple w-100";
+        submitButton.style.color = "white";
+        pageTitle.innerText = "Nieuwe Bakje - Verzorgen";
+        pageTitle.style.color = "white"; 
+        cardHeader.style.backgroundColor = "#6f42c1";
+        break;
                 case "Groen":
                     submitButton.className = "btn btn-success w-100";
                     pageTitle.innerText = "Nieuwe Bakje - Tuin";
                     cardHeader.style.backgroundColor = "#28a745";
                     pageTitle.style.color = "white";
                     break;
-                case "Oranje":
-                    submitButton.className = "btn btn-warning w-100";
-                    pageTitle.innerText = "Nieuwe Bakje - Land";
-                    cardHeader.style.backgroundColor = "#ffc107";
-                    pageTitle.style.color = "white";
-                    break;
-                case "Roze":
-                    submitButton.className = "btn btn-pink w-100";
-                    pageTitle.innerText = "Nieuwe Bakje - Tijden";
-                    cardHeader.style.backgroundColor = "#e83e8c";
-                    pageTitle.style.color = "white";
-                    break;
-                case "Geel":
-                    submitButton.className = "btn btn-warning w-100";
-                    pageTitle.innerText = "Nieuwe Bakje - Corvee";
-                    cardHeader.style.backgroundColor = "#ffcc00";
-                    pageTitle.style.color = "white";
-                    break;
+                   case "Oranje": 
+            submitButton.className = "btn btn-warning w-100";
+            pageTitle.innerText = "Nieuwe Bakje - Land";
+            cardHeader.style.backgroundColor = "#ffc107";
+            pageTitle.style.color = "black"; 
+            break;
+                     case "Roze": 
+        submitButton.className = "btn btn-pink w-100";
+        submitButton.style.color = "white"; 
+        pageTitle.innerText = "Nieuwe Bakje - Tijden";
+        cardHeader.style.backgroundColor = "#e83e8c";
+        pageTitle.style.color = "white";
+        break;
+                case "Geel": 
+            submitButton.className = "btn btn-warning w-100";
+            pageTitle.innerText = "Nieuwe Bakje - Corvee";
+            cardHeader.style.backgroundColor = "#ffcc00";
+            pageTitle.style.color = "black"; 
+            break;
                 case "Rood":
                     submitButton.className = "btn btn-danger w-100";
                     pageTitle.innerText = "Nieuwe Bakje - Creatief";
