@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿ @{
+var logoDir = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", "Logo");
+    var logoFiles = System.IO.Directory.GetFiles(logoDir);
+    var logoPath = logoFiles.Length > 0
+        ? "/images/Logo/" + System.IO.Path.GetFileName(logoFiles[0])
+        : null;
+        }
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -13,7 +20,10 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="d-flex justify-content-center w-100" style="margin-left: 10px;">
-                <img src="~/images/LogoBoerderij.png" class="img-fluid" style="width: 350px;">
+                @if (logoPath != null)
+                {
+                    <img src="@logoPath" class="img-fluid" style="width: 350px;" />
+                }
             </div>
         </nav>
     </header>
