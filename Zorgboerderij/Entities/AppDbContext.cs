@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Zorgboerderij.Entities;
+using Zorgboerderij.Models;
 
 namespace Zorgboerderij.Entities
 {
@@ -26,7 +27,7 @@ namespace Zorgboerderij.Entities
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<Zorgboerderij.Entities.Bezettingen> Bezettingen { get; set; } = default!;
-
+        public DbSet<Aanpasbaarheid> Aanpasbaarheid { get; set; }
     }
 
 }
