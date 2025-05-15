@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Zorgboerderij.Entities;
 using System.Linq;
+using System.Runtime.Intrinsics.Arm;
 
 public class DagplanningController : Controller
 {
@@ -59,5 +60,58 @@ public class DagplanningController : Controller
             return Json(new { success = true });
         }
         return Json(new { success = false });
+    }
+
+    public IActionResult Client(int id, string dag)
+    {
+        var client = _context.clienten.FirstOrDefault(c => c.persid == id);
+        if (client == null) return NotFound();
+
+        var dagplanning = _context.Dagindelingen
+            .Include(dp => dp.bakje)
+            .Where(dp => dp.clientId == id && dp.dagId == dag)
+            .OrderBy(dp => dp.volgorde)
+            .ToList();
+
+        var clienten = _context.clienten.ToList();
+
+        ViewBag.Client = client;
+        ViewBag.Dag = dag;
+        ViewBag.Clienten = clienten;
+
+        return View(dagplanning);
+    }
+
+    public IActionResult Bewerken(int id, string dag)
+    {
+        var client = _context.clienten.FirstOrDefault(c => c.persid == id);
+        if (client == null) return NotFound();
+
+        var dagplanning = _context.Dagindelingen
+            .Where(dp => dp.clientId == id && dp.dagId == dag)
+            .OrderBy(dp => dp.volgorde)
+            .ToList();
+
+        ViewBag.Client = client;
+        ViewBag.Dag = dag;
+
+        return View(dagplanning);
+    }
+
+    [HttpPost]
+    public IActionResult SavePlanning(int persid, string dag, List<Dagindeling> taken)
+    {
+        foreach (var taak in taken)
+        {
+            var bestaande = _context.Dagindelingen.FirstOrDefault(d => d.Id == taak.Id);
+            if (bestaande != null)
+            {
+                bestaande.soort = taak.soort;
+                bestaande.volgorde = taak.volgorde;
+            }
+        }
+
+        _context.SaveChanges();
+        return RedirectToAction("Bewerken", new { id = persid, dag = dag });
     }
 }

@@ -26,7 +26,7 @@
             @RenderBody()
         </main>
     </div>
-    <footer class="border-top footer text-muted"">
+    <footer class="footer text-muted"">
         <div class="container text-center py-3">
             <b>Gebruikersovereenkomst:</b> Demo Planbord ICT@Work | ICT@School
         </div>
@@ -39,70 +39,4 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-@if (magNietTerug)
-{
-    <div id="dagcodeModal" class="modal fade show" tabindex="-1" style="display:block; background:rgba(0,0,0,0.4);">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-3 shadow-lg">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title">Dagcode nodig</h5>
-                </div>
-                <div class="modal-body">
-                    <form id="dagcodeForm">
-                        <input type="hidden" id="gebruikersnaam" value="@(Context.Session.GetString("Dagcode"))" />
-                        <div class="mb-3">
-                            <label for="wachtwoord" class="form-label">Wachtwoord</label>
-                            <input type="password" id="wachtwoord" class="form-control" required />
-                        </div>
-                        <div id="loginFout" class="text-danger mb-2" style="display:none;"></div>
-                    </form>
-                </div>
-                <div class="modal-footer border-0">
-                    <button id="annuleerBtn" type="button" class="btn btn-outline-secondary">Annuleren</button>
-                    <button id="inloggenBtn" type="button" class="btn btn-primary">Inloggen</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-          var dagcode = '@(Context.Session.GetString("Dagcode") ?? "")';
-          var path   = window.location.pathname.toLowerCase();
-          var magNietTerug = dagcode &&
-              !path.includes("/dagplanning/dagkeuze") &&
-              !path.includes("/dagplanning/bewerken") &&
-              !path.includes("/dagindeling/client");
-
-          if (magNietTerug) {
-            // toon modal
-            document.getElementById("dagcodeModal").style.display = "block";
-          }
-
-          document.getElementById("annuleerBtn").addEventListener("click", function() {
-            window.location.href = `/Dagplanning/Dagkeuze?dag=${encodeURIComponent(dagcode)}`;
-          });
-
-          document.getElementById("inloggenBtn").addEventListener("click", function() {
-            var gebruikersnaam = dagcode;      // rechtstreeks uit sessie
-            var wachtwoord    = document.getElementById("wachtwoord").value;
-
-            fetch("@Url.Action("CheckDagcode", "Dagplanning")", {
-              method: "POST",
-              headers: {"Content-Type":"application/x-www-form-urlencoded"},
-              body: `gebruikersnaam=${encodeURIComponent(gebruikersnaam)}&wachtwoord=${encodeURIComponent(wachtwoord)}`
-            })
-            .then(r => r.json())
-            .then(json => {
-              if (json.success) {
-                location.reload();
-              } else {
-                var f = document.getElementById("loginFout");
-                f.innerText = "Ongeldige dagcode of wachtwoord.";
-                f.style.display = "block";
-              }
-            });
-          });
-        });
-    </script>
-}
 </html>

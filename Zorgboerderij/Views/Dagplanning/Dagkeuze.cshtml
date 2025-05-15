@@ -79,82 +79,39 @@
         (function(){
           let aanpassenModus = false, hoverTimer;
           const knop = document.getElementById('aanpassenKnop');
-
-          document.body.addEventListener('mousemove', e=>{
-            const inZone = e.clientX > window.innerWidth-120 && e.clientY > window.innerHeight-120;
-            if(inZone && !hoverTimer) {
-              hoverTimer = setTimeout(()=> knop.style.opacity = 1,2000);
+          document.body.addEventListener('mousemove', e => {
+            const inZone = e.clientX > window.innerWidth - 120 && e.clientY > window.innerHeight - 120;
+            if (inZone && !hoverTimer) {
+              hoverTimer = setTimeout(() => knop.style.opacity = 1, 2000);
             }
-            if(!inZone){
-              clearTimeout(hoverTimer);
-              hoverTimer = null;
-              knop.style.opacity = 0;
+            if (!inZone) {
+              clearTimeout(hoverTimer); hoverTimer = null; knop.style.opacity = 0;
             }
           });
-
-          knop.addEventListener('click', ()=>{
+          knop.addEventListener('click', () => {
             aanpassenModus = !aanpassenModus;
-            knop.style.backgroundColor = aanpassenModus?'#28a745':'#007bff';
-            knop.textContent = aanpassenModus?'✅ Aanpassen actief':'✏️ Aanpassen';
+            knop.style.backgroundColor = aanpassenModus ? '#28a745' : '#007bff';
+            knop.textContent = aanpassenModus ? '✅ Aanpassen actief' : '✏️ Aanpassen';
             sessionStorage.setItem('aanpassenModus', aanpassenModus);
           });
-
-          window.addEventListener('load', ()=>{
-            if(sessionStorage.getItem('aanpassenModus')==='true'){
+          window.addEventListener('load', () => {
+            if (sessionStorage.getItem('aanpassenModus') === 'true') {
               knop.style.backgroundColor = '#28a745';
               knop.textContent = '✅ Aanpassen actief';
               aanpassenModus = true;
             }
           });
-
-          document.querySelectorAll('.client-card').forEach(card=>{
-            card.addEventListener('click',()=>{
+          document.querySelectorAll('.client-card').forEach(card => {
+            card.addEventListener('click', () => {
               const id = card.dataset.id;
               const dag = '@dag';
-              const baseUrl = sessionStorage.getItem('aanpassenModus')==='true'
+              const baseUrl = sessionStorage.getItem('aanpassenModus') === 'true'
                 ? '/Dagplanning/Bewerken'
-                : '/Dagindeling/Client';
+                : '/Dagplanning/Client';
               window.location.href = `${baseUrl}?id=${id}&dag=${encodeURIComponent(dag)}`;
             });
           });
         })();
-
-        (function(){
-          const modalEl = document.getElementById('dagcodeModal');
-          const homeLink = document.querySelector('a[asp-controller="Home"][asp-action="Index"]');
-          if(!homeLink) return;
-          const modal = new bootstrap.Modal(modalEl);
-
-          homeLink.addEventListener('click', e=>{
-            e.preventDefault();
-            document.getElementById('foutMsg').style.display = 'none';
-            modal.show();
-          });
-
-          document.getElementById('loginBtn').addEventListener('click', ()=>{
-            const dag = document.getElementById('inputDag').value;
-            const ww  = document.getElementById('inputWw').value;
-            fetch('@Url.Action("CheckDagcode", "Dagplanning")',{
-              method:'POST',
-              headers:{'Content-Type':'application/x-www-form-urlencoded'},
-              body:`gebruikersnaam=${encodeURIComponent(dag)}&wachtwoord=${encodeURIComponent(ww)}`
-            })
-            .then(r=>r.json())
-            .then(json=>{
-              if(json.success){
-                fetch('@Url.Action("DagcodeLogin", "Dagplanning")',{
-                  method:'POST',
-                  headers:{'Content-Type':'application/x-www-form-urlencoded'},
-                  body:`dagcode=${encodeURIComponent(dag)}&wachtwoord=${encodeURIComponent(ww)}`
-                }).then(_=> window.location.href = '@Url.Action("Index", "Home")');
-              } else {
-                document.getElementById('foutMsg').style.display = 'block';
-              }
-            });
-          });
-
-          document.getElementById('cancelBtn')
-                  .addEventListener('click',()=> modal.hide());
-        })();
     </script>
 }
+

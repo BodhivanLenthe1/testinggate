@@ -1,0 +1,134 @@
+﻿@model List<Zorgboerderij.Entities.Dagindeling>
+@{
+    var client = ViewBag.Client as Zorgboerderij.Entities.Clienten;
+    var dag = ViewBag.Dag as string;
+    ViewData["Title"] = $"Dagplanning voor {client?.Voornaam} op {dag}";
+
+    string GetClientNaam(int? id)
+    {
+        if (id == null) return "";
+        var lijst = ViewBag.Clienten as List<Zorgboerderij.Entities.Clienten>;
+        var c = lijst?.FirstOrDefault(x => x.persid == id);
+        return c != null ? $"{c.Voornaam} {c.Achternaam}" : "Onbekend";
+    }
+
+    string GetAfbeeldingPath(string kleur, string foto)
+        => $"/images/bakjes/{kleur?.ToLower()}/{foto}";
+}
+
+<div class="container mt-4" style="max-width:800px;">
+    <h3 style="color:black; font-weight:normal; margin-bottom:20px;">
+        @ViewData["Title"]
+    </h3>
+
+    @if (!Model.Any())
+    {
+        <div style="padding:15px; background:#fff3cd; border-radius:6px; border:1px solid #ffeeba;">
+            Geen planning gevonden voor deze dag.
+        </div>
+    }
+    else
+    {
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            @foreach (var taak in Model)
+            {
+                var bakje = taak.bakje;
+                var imagePath = GetAfbeeldingPath(bakje?.Kleur, bakje?.Foto ?? "default.jpg");
+
+                <div style="
+             display:flex;
+             align-items:center;
+             justify-content:space-between;
+             border-left:2px solid black;
+             background-color:#f9f9f9;
+             padding:15px;
+             border-radius:6px;
+                   ">
+                    <!-- LINKERZIJDE: SVG-vink, icoon en titel -->
+                    <div style="display:flex; align-items:center;">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24"
+                             width="48" height="48"
+                             style="
+                   stroke:gray;
+                   stroke-width:6px;
+                   fill:none;
+                   cursor:pointer;
+                   margin-right:15px;
+                   user-select:none;
+                         "
+                             onclick="this.style.stroke = this.style.stroke === 'gray' ? 'limegreen' : 'gray';">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+
+                        <img src="@Url.Content(imagePath)"
+                             alt="@bakje?.Titel"
+                             style="
+                   width:80px;
+                   height:80px;
+                   object-fit:cover;
+                   margin-right:15px;
+                         " />
+
+                        <div>
+                            <h5 style="
+                      margin:0;
+                      font-size:1.2rem;
+                      color:black;
+                      font-weight:normal;
+                            ">
+                                @bakje?.Titel
+                            </h5>
+                        </div>
+                    </div>
+
+                    <!-- RECHTERZIJDE: samenwerkers -->
+                    <div style="display:flex; gap:15px; align-items:flex-start;">
+                        @{
+                            bool heeftSW = taak.sid != null || taak.sid2 != null;
+                        }
+                        @if (!heeftSW)
+                        {
+                            <div style="font-style:italic; color:#888; font-size:0.9rem;">
+                                geen samenwerkers
+                            </div>
+                        }
+                        else
+                        {
+                            foreach (var sid in new int?[] { taak.sid, taak.sid2 })
+                            {
+                                if (sid != null)
+                                {
+                                    var sw = (ViewBag.Clienten as List<Zorgboerderij.Entities.Clienten>)
+                                    ?.FirstOrDefault(c => c.persid == sid);
+                                    if (sw != null)
+                                    {
+                                        <div style="text-align:center;">
+                                            <img src="@Url.Content($"~/images/clienten/{sw.FotoFile}")"
+                                                 alt="@sw.Voornaam"
+                                                 style="
+                             width:60px;
+                             height:60px;
+                             object-fit:cover;
+                             border-radius:50%;
+                             border:2px solid black;
+                             margin-bottom:5px;
+                                                   " />
+                                            <div style="
+                             font-size:0.9rem;
+                             color:black;
+                             font-weight:normal;
+                                                   ">
+                                                @sw.Voornaam @sw.Achternaam
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

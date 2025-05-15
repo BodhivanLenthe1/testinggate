@@ -67,25 +67,28 @@
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-          var dagcode = '@(Context.Session.GetString("Dagcode") ?? "")';
-          var path   = window.location.pathname.toLowerCase();
+          var dagcode      = '@(Context.Session.GetString("Dagcode") ?? "")';
+          var path         = window.location.pathname.toLowerCase();
           var magNietTerug = dagcode &&
               !path.includes("/dagplanning/dagkeuze") &&
               !path.includes("/dagplanning/bewerken") &&
               !path.includes("/dagindeling/client");
 
           if (magNietTerug) {
-            // toon modal
             document.getElementById("dagcodeModal").style.display = "block";
           }
 
-          document.getElementById("annuleerBtn").addEventListener("click", function() {
+          var annuleerBtn = document.getElementById("annuleerBtn");
+          var inloggenBtn = document.getElementById("inloggenBtn");
+          var wwField     = document.getElementById("wachtwoord");
+
+          annuleerBtn.addEventListener("click", function() {
             window.location.href = `/Dagplanning/Dagkeuze?dag=${encodeURIComponent(dagcode)}`;
           });
 
-          document.getElementById("inloggenBtn").addEventListener("click", function() {
+          inloggenBtn.addEventListener("click", function() {
             var gebruikersnaam = dagcode;      // rechtstreeks uit sessie
-            var wachtwoord    = document.getElementById("wachtwoord").value;
+            var wachtwoord    = wwField.value;
 
             fetch("@Url.Action("CheckDagcode", "Dagplanning")", {
               method: "POST",
@@ -103,7 +106,15 @@
               }
             });
           });
+
+          wwField.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              inloggenBtn.click();
+            }
+          });
         });
     </script>
+
 }
 </html>

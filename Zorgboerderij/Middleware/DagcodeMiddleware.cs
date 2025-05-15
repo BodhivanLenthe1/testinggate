@@ -6,6 +6,8 @@
         "/dagplanning/dagkeuze",
         "/dagplanning/checkdagcode",
         "/dagplanning/dagcodelogin",
+        "/dagplanning/client",
+        "/dagplanning/bewerken",
         "/css/", "/js/", "/lib/"
     };
 

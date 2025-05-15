@@ -1,0 +1,36 @@
+﻿@model List<Zorgboerderij.Entities.Dagindeling>
+@{
+    var client = ViewBag.Client as Zorgboerderij.Entities.Clienten;
+    var dag = ViewBag.Dag as string;
+    ViewData["Title"] = $"Dagplanning bewerken voor {client?.Voornaam} op {dag}";
+}
+
+<div class="container mt-4">
+    <h3>@ViewData["Title"]</h3>
+
+    <form asp-action="SavePlanning" method="post">
+        <input type="hidden" name="persid" value="@client?.persid" />
+        <input type="hidden" name="dag" value="@dag" />
+
+        <div class="list-group mt-3">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <div class="list-group-item mb-3">
+                    <input type="hidden" name="taken[@i].Id" value="@Model[i].Id" />
+
+                    <div class="mb-2">
+                        <label>Taak</label>
+                        <input class="form-control" name="taken[@i].soort" value="@Model[i].soort" />
+                    </div>
+
+                    <div class="mb-2">
+                        <label>Volgorde</label>
+                        <input type="number" class="form-control" name="taken[@i].volgorde" value="@Model[i].volgorde" />
+                    </div>
+                </div>
+            }
+        </div>
+
+        <button type="submit" class="btn btn-success mt-3">✅ Opslaan</button>
+    </form>
+</div>
