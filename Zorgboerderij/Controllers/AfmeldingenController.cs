@@ -36,7 +36,7 @@ namespace Zorgboerderij.Controllers
             }
 
             var afmeldingen = await _context.afmeldingen
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.persid == id);
             if (afmeldingen == null)
             {
                 return NotFound();
@@ -58,7 +58,7 @@ namespace Zorgboerderij.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Client,Tandarts,Vakantie,Verjaardag,Ziek,Vrij,Dokter,OpKarwei")] Afmeldingen afmeldingen)
+        public async Task<IActionResult> Create([Bind("persid,Tandarts,Vakantie,Verjaardag,Ziek,Vrij,Dokter,OpKarwei")] Afmeldingen afmeldingen)
         {
             if (ModelState.IsValid)
             {
@@ -92,9 +92,9 @@ namespace Zorgboerderij.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Client,Tandarts,Vakantie,Verjaardag,Ziek,Vrij,Dokter,OpKarwei")] Afmeldingen afmeldingen)
+        public async Task<IActionResult> Edit(int id, [Bind("persid,Tandarts,Vakantie,Verjaardag,Ziek,Vrij,Dokter,OpKarwei")] Afmeldingen afmeldingen)
         {
-            if (id != afmeldingen.Id)
+            if (id != afmeldingen.persid)
             {
                 return NotFound();
             }
@@ -108,7 +108,7 @@ namespace Zorgboerderij.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AfmeldingenExists(afmeldingen.Id))
+                    if (!AfmeldingenExists(afmeldingen.persid))
                     {
                         return NotFound();
                     }
@@ -132,7 +132,7 @@ namespace Zorgboerderij.Controllers
             }
 
             var afmeldingen = await _context.afmeldingen
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.persid == id);
             if (afmeldingen == null)
             {
                 return NotFound();
@@ -159,7 +159,7 @@ namespace Zorgboerderij.Controllers
 
         private bool AfmeldingenExists(int id)
         {
-            return _context.afmeldingen.Any(e => e.Id == id);
+            return _context.afmeldingen.Any(e => e.persid == id);
         }
     }
 }

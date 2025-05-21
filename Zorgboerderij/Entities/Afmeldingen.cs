@@ -1,12 +1,12 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Zorgboerderij.Entities
 {
     public class Afmeldingen
     {
-        public int Id { get; set; }
-
-        public string Client { get; set; }
+        [Key]
+        public int persid { get; set; }
 
         public string Tandarts { get; set; }
 

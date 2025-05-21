@@ -18,20 +18,20 @@
     {
         <li class="list-group-item" style="border-radius: 16px; border-bottom: groove;">
             <div class="d-flex justify-content-between align-items-center afmelding-row p-3"
-                 onclick="toggleDetails('@item.Id', 'afmelding-details', 'afmeldingDetails-')"
+                 onclick="toggleDetails('@item.persid', 'afmelding-details', 'afmeldingDetails-')"
                  style="cursor: pointer;">
                 <div class="d-flex align-items-center">
-                    <h5 class="mb-0 me-3" style="font-weight: 600;">@item.Client</h5>
+                    <h5 class="mb-0 me-3" style="font-weight: 600;"></h5>
                 </div>
             </div>
-            <div id="afmeldingDetails-@item.Id" class="afmelding-details mt-3" style="display: none; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.5s ease, opacity 0.4s ease;">
+            <div id="afmeldingDetails-@item.persid" class="afmelding-details mt-3" style="display: none; overflow: hidden; max-height: 0; opacity: 0; transition: max-height 0.5s ease, opacity 0.4s ease;">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <dl class="row">
                                     <dt class="col-sm-4">Client</dt>
-                                    <dd class="col-sm-8">@item.Client</dd>
+                                    <dd class="col-sm-8"></dd>
                                 </dl>
                             </div>
                             <div class="col-md-6">
