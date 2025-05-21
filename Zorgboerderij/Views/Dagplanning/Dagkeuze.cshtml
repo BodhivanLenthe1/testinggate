@@ -91,13 +91,13 @@
           knop.addEventListener('click', () => {
             aanpassenModus = !aanpassenModus;
             knop.style.backgroundColor = aanpassenModus ? '#28a745' : '#007bff';
-            knop.textContent = aanpassenModus ? '✅ Aanpassen actief' : '✏️ Aanpassen';
+            knop.textContent = aanpassenModus ? 'Aanpassen actief' : 'Aanpassen';
             sessionStorage.setItem('aanpassenModus', aanpassenModus);
           });
           window.addEventListener('load', () => {
             if (sessionStorage.getItem('aanpassenModus') === 'true') {
               knop.style.backgroundColor = '#28a745';
-              knop.textContent = '✅ Aanpassen actief';
+              knop.textContent = 'Aanpassen actief';
               aanpassenModus = true;
             }
           });

@@ -28,6 +28,9 @@ namespace Zorgboerderij.Entities
         }
         public DbSet<Zorgboerderij.Entities.Bezettingen> Bezettingen { get; set; } = default!;
         public DbSet<Aanpasbaarheid> Aanpasbaarheid { get; set; }
+        public DbSet<AfgerondeTaak> AfgerondeTaken { get; set; }
+
+
     }
 
 }

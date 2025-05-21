@@ -1,36 +1,84 @@
-﻿@model List<Zorgboerderij.Entities.Dagindeling>
-@{
-    var client = ViewBag.Client as Zorgboerderij.Entities.Clienten;
-    var dag = ViewBag.Dag as string;
-    ViewData["Title"] = $"Dagplanning bewerken voor {client?.Voornaam} op {dag}";
+﻿@{
+    ViewData["Title"] = "Dagplanning bewerken – Prototype";
 }
+<div class="container my-4">
+    <h2>@ViewData["Title"]</h2>
 
-<div class="container mt-4">
-    <h3>@ViewData["Title"]</h3>
-
-    <form asp-action="SavePlanning" method="post">
-        <input type="hidden" name="persid" value="@client?.persid" />
-        <input type="hidden" name="dag" value="@dag" />
-
-        <div class="list-group mt-3">
-            @for (int i = 0; i < Model.Count; i++)
-            {
-                <div class="list-group-item mb-3">
-                    <input type="hidden" name="taken[@i].Id" value="@Model[i].Id" />
-
-                    <div class="mb-2">
-                        <label>Taak</label>
-                        <input class="form-control" name="taken[@i].soort" value="@Model[i].soort" />
-                    </div>
-
-                    <div class="mb-2">
-                        <label>Volgorde</label>
-                        <input type="number" class="form-control" name="taken[@i].volgorde" value="@Model[i].volgorde" />
-                    </div>
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="mb-2">
+                <input id="searchInput" type="text" class="form-control" placeholder="Zoeken…">
+            </div>
+            <div class="mb-3">
+                <select id="kleurSort" class="form-select">
+                    <option value="">Alle activiteiten</option>
+                         <option value="rood">Creatief</option>
+                         <option value="groen">Tuin</option> -->
+                </select>
+            </div>
+            <div id="bakjes" class="connectedSortable"
+                 style="min-height:400px;border:1px solid #ccc;padding:10px;
+                        border-radius:6px;background:#fafafa;overflow-y:auto;">
+                <div class="photoItem mb-2 p-2 text-center" data-id="1" data-kleur="rood">
+                  <div class="fw-semibold text-truncate">Creatief</div>
+                  <img src="/images/placeholder.jpg" alt="Creatief" class="img-fluid rounded mt-1" style="aspect-ratio:1/1;object-fit:cover;">
                 </div>
-            }
+            </div>
         </div>
 
-        <button type="submit" class="btn btn-success mt-3">✅ Opslaan</button>
+        <div class="col-md-9">
+            <div id="planningTimeline" class="connectedSortable d-flex flex-wrap gap-2 p-3"
+                 style="min-height:400px;border:2px dashed #aaa;
+                        border-radius:6px;background:#f9f9f9;overflow-x:auto;">
+                <div class="photoItem p-2 text-center" data-id="1" data-extra="0">
+                  <div class="fw-semibold text-truncate">Ochtendroutine</div>
+                  <img src="/images/placeholder.jpg" alt="Ochtendroutine" class="img-fluid rounded mt-1" style="aspect-ratio:1/1;object-fit:cover;">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <form id="saveForm" asp-action="SavePlanning" method="post" class="mt-4">
+        <input type="hidden" id="volgordeInput" name="nieuweVolgorde" />
+        <button type="submit" class="btn btn-success">💾 Opslaan</button>
     </form>
 </div>
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script>
+        $(function() {
+            function renderBakjes() {
+                const sel = $('#kleurSort').val();
+                const q   = $('#searchInput').val().toLowerCase();
+                $('#bakjes .photoItem').each(function() {
+                    const $it    = $(this);
+                    const kleur  = $it.data('kleur');
+                    const title  = $it.find('.fw-semibold').text().toLowerCase();
+                    $it.toggle((!sel || kleur === sel) && title.includes(q));
+                });
+            }
+            $('#kleurSort, #searchInput').on('change keyup', renderBakjes);
+
+            $('.connectedSortable').sortable({
+                connectWith: '.connectedSortable',
+                placeholder: 'sortable-placeholder',
+                forcePlaceholderSize: true,
+                helper: 'clone'
+            }).disableSelection();
+
+            $('#saveForm').on('submit', function() {
+                const volg = [];
+                $('#planningTimeline .photoItem').each(function() {
+                    const id      = $(this).data('id');
+                    const isExtra = $(this).data('extra') ? 1 : 0;
+                    volg.push(`${id}:${isExtra}`);
+                });
+                $('#volgordeInput').val(volg.join(','));
+            });
+        });
+    </script>
+}

@@ -3,6 +3,8 @@
     var client = ViewBag.Client as Zorgboerderij.Entities.Clienten;
     var dag = ViewBag.Dag as string;
     ViewData["Title"] = $"Dagplanning voor {client?.Voornaam} op {dag}";
+    var afgerondBids = ViewBag.AfgerondBids as List<int> ?? new List<int>();
+    var dagDatum = ViewBag.DagDatum as string;
 
     string GetClientNaam(int? id)
     {
@@ -44,23 +46,20 @@
              padding:15px;
              border-radius:6px;
                    ">
-                    <!-- LINKERZIJDE: SVG-vink, icoon en titel -->
                     <div style="display:flex; align-items:center;">
                         <svg xmlns="http://www.w3.org/2000/svg"
                              viewBox="0 0 24 24"
                              width="48" height="48"
-                             style="
-                   stroke:gray;
-                   stroke-width:6px;
-                   fill:none;
-                   cursor:pointer;
-                   margin-right:15px;
-                   user-select:none;
-                         "
-                             onclick="this.style.stroke = this.style.stroke === 'gray' ? 'limegreen' : 'gray';">
+                             data-bid="@bakje?.bid"
+                             data-persid="@client?.persid"
+                             data-dag="@dag"
+                             data-plandatum="@dagDatum"
+                             data-sid="@taak.sid"
+                             data-sid2="@taak.sid2"
+                             style="stroke:@(afgerondBids.Contains(bakje?.bid ?? -1) ? "limegreen" : "gray");stroke-width:6px;fill:none;cursor:pointer;margin-right:15px;user-select:none;"
+                             onclick="toggleTaak(this)">
                             <polyline points="20 6 9 17 4 12" />
                         </svg>
-
                         <img src="@Url.Content(imagePath)"
                              alt="@bakje?.Titel"
                              style="
@@ -82,7 +81,6 @@
                         </div>
                     </div>
 
-                    <!-- RECHTERZIJDE: samenwerkers -->
                     <div style="display:flex; gap:15px; align-items:flex-start;">
                         @{
                             bool heeftSW = taak.sid != null || taak.sid2 != null;
@@ -107,17 +105,17 @@
                                             <img src="@Url.Content($"~/images/clienten/{sw.FotoFile}")"
                                                  alt="@sw.Voornaam"
                                                  style="
-                             width:60px;
-                             height:60px;
-                             object-fit:cover;
-                             border-radius:50%;
-                             border:2px solid black;
-                             margin-bottom:5px;
+                                                        width:60px;
+                                                        height:60px;
+                                                        object-fit:cover;
+                                                        border-radius:50%;
+                                                        border:2px solid black;
+                                                        margin-bottom:5px;
                                                    " />
                                             <div style="
-                             font-size:0.9rem;
-                             color:black;
-                             font-weight:normal;
+                                                        font-size:0.9rem;
+                                                        color:black;
+                                                        font-weight:normal;
                                                    ">
                                                 @sw.Voornaam @sw.Achternaam
                                             </div>
@@ -132,3 +130,32 @@
         </div>
     }
 </div>
+<script>
+    function toggleTaak(el) {
+        var bid       = el.getAttribute('data-bid');
+        var persid    = el.getAttribute('data-persid');
+        var dag       = el.getAttribute('data-dag');
+        var plandatum = el.getAttribute('data-plandatum');
+        var sid       = el.getAttribute('data-sid');
+        var sid2      = el.getAttribute('data-sid2');
+        var afgerond  = el.style.stroke === 'limegreen';
+
+        el.style.stroke = afgerond ? 'gray' : 'limegreen';
+
+        if (afgerond) {
+            fetch('/Dagplanning/TaakHeropenen', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `bid=${encodeURIComponent(bid)}&persid=${encodeURIComponent(persid)}&dag=${encodeURIComponent(dag)}&plandatum=${encodeURIComponent(plandatum)}`
+            });
+        } else {
+            fetch('/Dagplanning/TaakAfvinken', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `bid=${encodeURIComponent(bid)}&persid=${encodeURIComponent(persid)}&dag=${encodeURIComponent(dag)}&plandatum=${encodeURIComponent(plandatum)}&sid=${encodeURIComponent(sid)}&sid2=${encodeURIComponent(sid2)}`
+            });
+        }
+    }
+</script>
+
+
