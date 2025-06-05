@@ -110,26 +110,61 @@ public class DagplanningController : Controller
         if (client == null) return NotFound();
 
         var dagplanning = _context.Dagindelingen
+            .Include(dp => dp.bakje)
             .Where(dp => dp.clientId == id && dp.dagId == dag)
             .OrderBy(dp => dp.volgorde)
             .ToList();
 
-        ViewBag.Client = client;
-        ViewBag.Dag = dag;
+        var bakjes = _context.bakjes.ToList();
 
-        return View(dagplanning);
+        var model = new Zorgboerderij.Models.DagplanningBewerkenViewModel
+        {
+            Client = client,
+            Dag = dag,
+            Dagplanning = dagplanning,
+            Bakjes = bakjes
+        };
+
+        return View(model);
     }
 
     [HttpPost]
-    public IActionResult SavePlanning(int persid, string dag, List<Dagindeling> taken)
+    public IActionResult SavePlanning(int persid, string dag, string nieuweVolgorde)
     {
-        foreach (var taak in taken)
+        var taken = _context.Dagindelingen
+            .Where(d => d.clientId == persid && d.dagId == dag)
+            .ToList();
+
+        var parsed = (nieuweVolgorde ?? string.Empty)
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select((s, idx) => new { Parts = s.Split(':'), Index = idx })
+            .Where(x => x.Parts.Length == 2)
+            .Select(x => new { Id = int.Parse(x.Parts[0]), Extra = x.Parts[1] == "1", Order = x.Index })
+            .ToList();
+
+        foreach (var item in parsed)
         {
-            var bestaande = _context.Dagindelingen.FirstOrDefault(d => d.Id == taak.Id);
+            var bestaande = taken.FirstOrDefault(t => t.bid == item.Id);
             if (bestaande != null)
             {
-                bestaande.soort = taak.soort;
-                bestaande.volgorde = taak.volgorde;
+                bestaande.volgorde = item.Order;
+            }
+            else if (item.Extra)
+            {
+                var bakje = _context.bakjes.FirstOrDefault(b => b.bid == item.Id);
+                if (bakje != null)
+                {
+                    _context.Dagindelingen.Add(new Dagindeling
+                    {
+                        clientId = persid,
+                        dagId = dag,
+                        bid = item.Id,
+                        kleur = bakje.Kleur,
+                        soort = "tijdelijk",
+                        volgorde = item.Order,
+                        datum = DateTime.Now.Date
+                    });
+                }
             }
         }
 

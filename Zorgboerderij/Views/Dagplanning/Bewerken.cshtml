@@ -1,68 +1,50 @@
-﻿@{
-    ViewData["Title"] = "Dagplanning bewerken – Prototype";
+@model Zorgboerderij.Models.DagplanningBewerkenViewModel
+@{
+    ViewData["Title"] = "Dagplanning bewerken";
 }
 <div class="container my-4">
-    <h2>@ViewData["Title"]</h2>
-
+    <h3>@ViewData["Title"] – @Model.Client.Voornaam @Model.Client.Achternaam (@Model.Dag)</h3>
     <div class="row">
         <div class="col-md-3 mb-4">
-            <div class="mb-2">
-                <input id="searchInput" type="text" class="form-control" placeholder="Zoeken…">
-            </div>
-            <div class="mb-3">
-                <select id="kleurSort" class="form-select">
-                    <option value="">Alle activiteiten</option>
-                         <option value="rood">Creatief</option>
-                         <option value="groen">Tuin</option> -->
-                </select>
-            </div>
-            <div id="bakjes" class="connectedSortable"
-                 style="min-height:400px;border:1px solid #ccc;padding:10px;
-                        border-radius:6px;background:#fafafa;overflow-y:auto;">
-                <div class="photoItem mb-2 p-2 text-center" data-id="1" data-kleur="rood">
-                  <div class="fw-semibold text-truncate">Creatief</div>
-                  <img src="/images/placeholder.jpg" alt="Creatief" class="img-fluid rounded mt-1" style="aspect-ratio:1/1;object-fit:cover;">
+            <div id="bakjes" class="connectedSortable" style="min-height:400px;border:1px solid #ccc;padding:10px;border-radius:6px;background:#fafafa;overflow-y:auto;">
+@foreach (var b in Model.Bakjes)
+{
+                <div class="photoItem mb-2 p-2 text-center" data-id="@b.bid" data-kleur="@b.Kleur.ToLower()">
+                    <div class="fw-semibold text-truncate">@b.Titel</div>
+                    <img src="@Url.Content($"/images/Bakjes/{b.Kleur.ToLower()}/{b.Foto}")" class="img-fluid rounded mt-1" style="aspect-ratio:1/1;object-fit:cover;" />
                 </div>
+}
             </div>
         </div>
-
         <div class="col-md-9">
-            <div id="planningTimeline" class="connectedSortable d-flex flex-wrap gap-2 p-3"
-                 style="min-height:400px;border:2px dashed #aaa;
-                        border-radius:6px;background:#f9f9f9;overflow-x:auto;">
-                <div class="photoItem p-2 text-center" data-id="1" data-extra="0">
-                  <div class="fw-semibold text-truncate">Ochtendroutine</div>
-                  <img src="/images/placeholder.jpg" alt="Ochtendroutine" class="img-fluid rounded mt-1" style="aspect-ratio:1/1;object-fit:cover;">
+            <div id="planningTimeline" class="connectedSortable d-flex flex-wrap gap-2 p-3" style="min-height:400px;border:2px dashed #aaa;border-radius:6px;background:#f9f9f9;overflow-x:auto;">
+@foreach (var t in Model.Dagplanning)
+{
+                <div class="photoItem p-2 text-center" data-id="@t.bid" data-extra="0">
+                    <div class="fw-semibold text-truncate">@t.bakje?.Titel</div>
+                    <img src="@Url.Content($"/images/Bakjes/{t.kleur.ToLower()}/{t.bakje?.Foto}")" class="img-fluid rounded mt-1" style="aspect-ratio:1/1;object-fit:cover;" />
                 </div>
-
+}
             </div>
         </div>
     </div>
-
-    <form id="saveForm" asp-action="SavePlanning" method="post" class="mt-4">
+</div>
+<div id="bottomBar" style="position:fixed;bottom:0;left:0;right:0;background:#eee;padding:10px;border-top:1px solid #ccc;">
+    <form id="saveForm" asp-action="SavePlanning" method="post" class="d-flex">
+        <input type="hidden" name="persid" value="@Model.Client.persid" />
+        <input type="hidden" name="dag" value="@Model.Dag" />
         <input type="hidden" id="volgordeInput" name="nieuweVolgorde" />
-        <button type="submit" class="btn btn-success">💾 Opslaan</button>
+        <input id="extraInput" class="form-control me-2" placeholder="Extra taak ID" />
+        <button type="button" id="addExtra" class="btn btn-secondary me-2">Voeg toe</button>
+        <button type="submit" class="btn btn-success">Opslaan</button>
     </form>
 </div>
-
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script>
-        $(function() {
-            function renderBakjes() {
-                const sel = $('#kleurSort').val();
-                const q   = $('#searchInput').val().toLowerCase();
-                $('#bakjes .photoItem').each(function() {
-                    const $it    = $(this);
-                    const kleur  = $it.data('kleur');
-                    const title  = $it.find('.fw-semibold').text().toLowerCase();
-                    $it.toggle((!sel || kleur === sel) && title.includes(q));
-                });
-            }
-            $('#kleurSort, #searchInput').on('change keyup', renderBakjes);
-
+        $(function(){
             $('.connectedSortable').sortable({
                 connectWith: '.connectedSortable',
                 placeholder: 'sortable-placeholder',
@@ -70,12 +52,23 @@
                 helper: 'clone'
             }).disableSelection();
 
-            $('#saveForm').on('submit', function() {
-                const volg = [];
-                $('#planningTimeline .photoItem').each(function() {
-                    const id      = $(this).data('id');
-                    const isExtra = $(this).data('extra') ? 1 : 0;
-                    volg.push(`${id}:${isExtra}`);
+            $('#addExtra').on('click', function(){
+                var id = $('#extraInput').val();
+                if(!id) return;
+                var $tpl = $('#bakjes .photoItem[data-id="'+id+'"]').first().clone();
+                if($tpl.length){
+                    $tpl.attr('data-extra','1');
+                    $('#planningTimeline').append($tpl);
+                }
+                $('#extraInput').val('');
+            });
+
+            $('#saveForm').on('submit', function(){
+                var volg = [];
+                $('#planningTimeline .photoItem').each(function(){
+                    var id  = $(this).data('id');
+                    var ex  = $(this).data('extra') ? 1 : 0;
+                    volg.push(id+':'+ex);
                 });
                 $('#volgordeInput').val(volg.join(','));
             });
