@@ -134,9 +134,6 @@ public partial class ZdemoContext : DbContext
             entity.Property(e => e.Dagid)
                 .HasMaxLength(50)
                 .HasColumnName("dagid");
-            entity.Property(e => e.Datum)
-                .HasColumnType("datetime")
-                .HasColumnName("datum");
             entity.Property(e => e.Kleur)
                 .HasMaxLength(50)
                 .HasColumnName("kleur");

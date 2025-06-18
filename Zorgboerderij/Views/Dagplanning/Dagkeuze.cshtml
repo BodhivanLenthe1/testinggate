@@ -25,8 +25,7 @@
         style="position: fixed; bottom: 15px; right: 15px; opacity: 0; transition: opacity 0.3s;
                z-index: 9999; background-color: #007bff; color: white; border: none;
                border-radius: 6px; padding: 6px 10px; font-size: 0.8rem;
-               font-weight: 500; cursor: pointer;">
-    ✏️ Aanpassen
+               font-weight: 500; cursor: pointer;"> Aanpassen
 </button>
 <div class="container mt-5">
     <div class="mb-5">
@@ -76,42 +75,54 @@
 @section Scripts {
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        (function(){
-          let aanpassenModus = false, hoverTimer;
-          const knop = document.getElementById('aanpassenKnop');
-          document.body.addEventListener('mousemove', e => {
-            const inZone = e.clientX > window.innerWidth - 120 && e.clientY > window.innerHeight - 120;
-            if (inZone && !hoverTimer) {
-              hoverTimer = setTimeout(() => knop.style.opacity = 1, 2000);
+        (function () {
+            let aanpassenModus = false;
+            let hoverTimer = null;
+            let isInZone = false;
+            const knop = document.getElementById('aanpassenKnop');
+
+            function checkHoverZone(e) {
+                const inZone = e.clientX > window.innerWidth - 120 && e.clientY > window.innerHeight - 120;
+
+                if (inZone && !isInZone) {
+                    isInZone = true;
+                    hoverTimer = setTimeout(() => {
+                        knop.style.opacity = 1;
+                    }, 2000);
+                } else if (!inZone && isInZone) {
+                    isInZone = false;
+                    clearTimeout(hoverTimer);
+                    knop.style.opacity = 0;
+                }
             }
-            if (!inZone) {
-              clearTimeout(hoverTimer); hoverTimer = null; knop.style.opacity = 0;
-            }
-          });
-          knop.addEventListener('click', () => {
-            aanpassenModus = !aanpassenModus;
-            knop.style.backgroundColor = aanpassenModus ? '#28a745' : '#007bff';
-            knop.textContent = aanpassenModus ? 'Aanpassen actief' : 'Aanpassen';
-            sessionStorage.setItem('aanpassenModus', aanpassenModus);
-          });
-          window.addEventListener('load', () => {
-            if (sessionStorage.getItem('aanpassenModus') === 'true') {
-              knop.style.backgroundColor = '#28a745';
-              knop.textContent = 'Aanpassen actief';
-              aanpassenModus = true;
-            }
-          });
-          document.querySelectorAll('.client-card').forEach(card => {
-            card.addEventListener('click', () => {
-              const id = card.dataset.id;
-              const dag = '@dag';
-              const baseUrl = sessionStorage.getItem('aanpassenModus') === 'true'
-                ? '/Dagplanning/Bewerken'
-                : '/Dagplanning/Client';
-              window.location.href = `${baseUrl}?id=${id}&dag=${encodeURIComponent(dag)}`;
+
+            document.body.addEventListener('mousemove', checkHoverZone);
+
+            knop.addEventListener('click', () => {
+                aanpassenModus = !aanpassenModus;
+                knop.style.backgroundColor = aanpassenModus ? '#28a745' : '#007bff';
+                knop.textContent = aanpassenModus ? 'Aanpassen actief' : 'Aanpassen';
+                sessionStorage.setItem('aanpassenModus', aanpassenModus);
             });
-          });
+
+            window.addEventListener('load', () => {
+                if (sessionStorage.getItem('aanpassenModus') === 'true') {
+                    knop.style.backgroundColor = '#28a745';
+                    knop.textContent = 'Aanpassen actief';
+                    aanpassenModus = true;
+                }
+            });
+
+            document.querySelectorAll('.client-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const id = card.dataset.id;
+                    const dag = '@dag';
+                    const baseUrl = sessionStorage.getItem('aanpassenModus') === 'true'
+                        ? '/Dagplanning/Bewerken'
+                        : '/Dagplanning/Client';
+                    window.location.href = `${baseUrl}?id=${id}&dag=${encodeURIComponent(dag)}`;
+                });
+            });
         })();
     </script>
 }
-

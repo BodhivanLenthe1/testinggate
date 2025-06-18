@@ -1,186 +1,330 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Zorgboerderij.Entities;
-using System.Linq;
-using System.Runtime.Intrinsics.Arm;
 
-public class DagplanningController : Controller
+namespace Zorgboerderij.Controllers
 {
-    private readonly AppDbContext _context;
-
-    public DagplanningController(AppDbContext context)
+    public class DagplanningController : Controller
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
+        public DagplanningController(AppDbContext context)
+            => _context = context;
 
-    public IActionResult Dagkeuze(string dag, string melding)
-    {
-        HttpContext.Session.SetString("Dagcode", dag);
-        ViewBag.Melding = melding;
-
-        var clienten = _context.clienten.Where(c => EF.Property<string>(c, dag) != "X").ToList();
-        var personeel = _context.personeel.Where(p => EF.Property<string>(p, dag) != "X").ToList();
-
-        ViewBag.Personeel = personeel;
-        ViewBag.Dag = dag;
-
-        return View(clienten);
-    }
-
-
-    [HttpPost]
-    public IActionResult DagcodeLogin(string dagcode, string wachtwoord)
-    {
-        var match = _context.dagCodes
-            .FirstOrDefault(d => d.Dag == dagcode && d.DagCode == wachtwoord);
-
-        if (match != null)
+        public IActionResult Dagkeuze(string dag, string melding)
         {
-            HttpContext.Session.Remove("Dagcode");
-            return RedirectToAction("Index", "Home");
+            HttpContext.Session.SetString("Dagcode", dag);
+            ViewBag.Melding = melding;
+
+            var clienten = _context.clienten
+                .Where(c => EF.Property<string>(c, dag) != "X")
+                .ToList();
+            var personeel = _context.personeel
+                .Where(p => EF.Property<string>(p, dag) != "X")
+                .ToList();
+
+            ViewBag.Personeel = personeel;
+            ViewBag.Dag = dag;
+            return View(clienten);
         }
 
-        TempData["LoginFout"] = "Ongeldige dagcode of wachtwoord.";
-        return Redirect(Request.Headers["Referer"].ToString());
-    }
-
-    [HttpPost]
-    public IActionResult CheckDagcode(string gebruikersnaam, string wachtwoord)
-    {
-        var sessionDag = HttpContext.Session.GetString("Dagcode");
-        if (string.IsNullOrEmpty(sessionDag))
-            return Json(new { success = false });
-
-        var dagcode = _context.dagCodes
-            .FirstOrDefault(d => d.Dag == sessionDag && d.DagCode == wachtwoord);
-
-        if (dagcode != null)
+        private string GetNederlandseDagNaam(DayOfWeek dag)
         {
-            HttpContext.Session.Remove("Dagcode");
+            return dag switch
+            {
+                DayOfWeek.Monday => "Maandag",
+                DayOfWeek.Tuesday => "Dinsdag",
+                DayOfWeek.Wednesday => "Woensdag",
+                DayOfWeek.Thursday => "Donderdag",
+                DayOfWeek.Friday => "Vrijdag",
+                DayOfWeek.Saturday => "Zaterdag",
+                DayOfWeek.Sunday => "Zondag",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
+        [HttpPost]
+        public IActionResult DagcodeLogin(string dagcode, string wachtwoord)
+        {
+            var match = _context.dagCodes
+                .FirstOrDefault(d => d.Dag == dagcode && d.DagCode == wachtwoord);
+            if (match != null)
+            {
+                HttpContext.Session.Remove("Dagcode");
+                return RedirectToAction("Index", "Home");
+            }
+            TempData["LoginFout"] = "Ongeldige dagcode of wachtwoord.";
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        [HttpPost]
+        public IActionResult CheckDagcode(string gebruikersnaam, string wachtwoord)
+        {
+            var sessionDag = HttpContext.Session.GetString("Dagcode");
+            if (string.IsNullOrEmpty(sessionDag))
+                return Json(new { success = false });
+
+            var dagcode = _context.dagCodes
+                .FirstOrDefault(d => d.Dag == sessionDag && d.DagCode == wachtwoord);
+            if (dagcode != null)
+            {
+                HttpContext.Session.Remove("Dagcode");
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
+
+        public IActionResult Client(int id, string dag)
+        {
+            var client = _context.clienten.FirstOrDefault(c => c.persid == id);
+            if (client == null) return NotFound();
+
+            if (string.IsNullOrEmpty(dag))
+                dag = GetNederlandseDagNaam(DateTime.Today.DayOfWeek);
+            ViewBag.Dag = dag;
+            ViewBag.Client = client;
+
+            var weekStart = DateTime.Today
+                .AddDays(-(int)DateTime.Today.DayOfWeek + (int)DayOfWeek.Monday);
+            int offset = dag switch
+            {
+                "Maandag" => 0,
+                "Dinsdag" => 1,
+                "Woensdag" => 2,
+                "Donderdag" => 3,
+                "Vrijdag" => 4,
+                "Zaterdag" => 5,
+                "Zondag" => 6,
+                _ => 0
+            };
+            var planDt = weekStart.AddDays(offset);
+            ViewBag.DagDatum = planDt.ToString("yyyy-MM-dd");
+
+            var dagplanning = _context.Dagindelingen
+                .Include(dp => dp.bakje)
+                .Where(dp =>
+                    dp.clientId == id &&
+                    dp.dagId == dag &&
+                    (
+                        dp.soort == "standaard" ||
+                        (dp.soort == "eenmalig" && dp.datum == planDt)
+                    )
+                )
+                .OrderBy(dp => dp.volgorde)
+                .ToList();
+
+            ViewBag.AfgerondBids = _context.AfgerondeTaken
+                .Where(a =>
+                    a.persid == id &&
+                    a.dag == dag &&
+                    a.plandatum == planDt
+                )
+                .Select(a => a.bid)
+                .ToList();
+
+            ViewBag.Clienten = _context.clienten.ToList();
+
+            return View(dagplanning);
+        }
+
+
+        public IActionResult Bewerken(int id, string dag)
+        {
+            var client = _context.clienten.FirstOrDefault(c => c.persid == id);
+            if (client == null) return NotFound();
+
+            if (string.IsNullOrEmpty(dag))
+                dag = GetNederlandseDagNaam(DateTime.Today.DayOfWeek);
+
+            ViewBag.Dag = dag;
+            ViewBag.Client = client;
+
+            var weekStart = DateTime.Today
+                .AddDays(-(int)DateTime.Today.DayOfWeek + (int)DayOfWeek.Monday);
+            int offset = dag switch
+            {
+                "Maandag" => 0,
+                "Dinsdag" => 1,
+                "Woensdag" => 2,
+                "Donderdag" => 3,
+                "Vrijdag" => 4,
+                "Zaterdag" => 5,
+                "Zondag" => 6,
+                _ => 0
+            };
+            var planDt = weekStart.AddDays(offset);
+            ViewBag.DagDatum = planDt.ToString("yyyy-MM-dd");
+
+            var dagplanning = _context.Dagindelingen
+                .Include(d => d.bakje)
+                .Where(d =>
+                    d.clientId == id &&
+                    d.dagId == dag &&
+                    (
+                        d.soort == "standaard"
+                        ||
+                        (d.soort == "eenmalig" && d.datum == planDt)
+                    )
+                )
+                .OrderBy(d => d.volgorde)
+                .ToList();
+
+            var model = new DagindelingViewModel
+            {
+                Client = client,
+                Dagindelingen = dagplanning,
+                Bakjes = _context.bakjes.ToList(),
+                AlleClienten = _context.clienten.ToList(),
+                Dag = dag
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult SavePlanning(
+            int clientId,
+            string dag,
+            string nieuweVolgorde,     
+            Dictionary<string, string> Samenwerkers)
+        {
+            var weekStart = DateTime.Today
+                .AddDays(-(int)DateTime.Today.DayOfWeek + (int)DayOfWeek.Monday);
+            int offset = dag switch
+            {
+                "Maandag" => 0,
+                "Dinsdag" => 1,
+                "Woensdag" => 2,
+                "Donderdag" => 3,
+                "Vrijdag" => 4,
+                "Zaterdag" => 5,
+                "Zondag" => 6,
+                _ => 0
+            };
+            var planDt = weekStart.AddDays(offset);
+
+            var toRemove = _context.Dagindelingen
+                .Where(d =>
+                    d.clientId == clientId &&
+                    d.soort == "eenmalig" &&
+                    d.dagId == dag &&
+                    d.datum == planDt);
+            _context.Dagindelingen.RemoveRange(toRemove);
+            _context.SaveChanges();
+
+            var standaard = _context.Dagindelingen
+                .Where(d =>
+                    d.clientId == clientId &&
+                    d.soort == "standaard" &&
+                    d.dagId == dag)
+                .OrderBy(d => d.volgorde)
+                .ToList();
+            var stdMap = standaard.ToDictionary(d => d.bid, d => d.volgorde);
+
+            var bids = (nieuweVolgorde ?? "")
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(s => int.TryParse(s, out var x) ? x : -1)
+                .Where(x => x != -1)
+                .ToList();
+
+            Samenwerkers ??= new();
+            int lastStdVolg = 0, tempCount = 0;
+            int stdIndex = 0;
+            var stdBids = standaard.Select(d => d.bid).ToList();
+
+            foreach (var bid in bids)
+            {
+                if (stdIndex < stdBids.Count && bid == stdBids[stdIndex])
+                {
+                    lastStdVolg = stdMap[bid];
+                    stdIndex++;
+                    tempCount = 0;
+                    continue;
+                }
+
+                tempCount++;
+                var volg = lastStdVolg + tempCount;
+
+                int idx = bids.IndexOf(bid);
+                Samenwerkers.TryGetValue($"{bid}_{idx}", out var swVal);
+                var swIds = (swVal ?? "")
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(int.Parse)
+                    .ToArray();
+
+                var bakje = _context.bakjes.Find(bid);
+
+                var taak = new Dagindeling
+                {
+                    clientId = clientId,
+                    dagId = dag,
+                    datum = planDt,
+                    bid = bid,
+                    kleur = bakje?.Kleur ?? "",
+                    soort = "eenmalig",
+                    volgorde = volg,
+                    sid = swIds.ElementAtOrDefault(0),
+                    sid2 = swIds.ElementAtOrDefault(1)
+                };
+                _context.Dagindelingen.Add(taak);
+            }
+
+            _context.SaveChanges();
+            return RedirectToAction("Bewerken", new { id = clientId, dag });
+        }
+
+
+        [HttpPost]
+        public IActionResult TaakAfvinken(
+            int bid, int persid, string dag,
+            string plandatum, int? sid, int? sid2)
+        {
+            DateTime planDt = DateTime.Parse(plandatum);
+            var bestaat = _context.AfgerondeTaken.FirstOrDefault(a =>
+                a.bid == bid &&
+                a.persid == persid &&
+                a.dag == dag &&
+                a.plandatum == planDt
+            );
+            if (bestaat == null)
+            {
+                var taak = new AfgerondeTaak
+                {
+                    bid = bid,
+                    persid = persid,
+                    sid = sid,
+                    sid2 = sid2,
+                    dag = dag,
+                    plandatum = planDt,
+                    datum_afronden = DateTime.Now.Date,
+                    tijd_afronden = DateTime.Now.TimeOfDay
+                };
+                _context.AfgerondeTaken.Add(taak);
+                _context.SaveChanges();
+            }
             return Json(new { success = true });
         }
-        return Json(new { success = false });
-    }
 
-    public IActionResult Client(int id, string dag)
-    {
-        var client = _context.clienten.FirstOrDefault(c => c.persid == id);
-        if (client == null) return NotFound();
-
-        var dagplanning = _context.Dagindelingen
-            .Include(dp => dp.bakje)
-            .Where(dp => dp.clientId == id && dp.dagId == dag)
-            .OrderBy(dp => dp.volgorde)
-            .ToList();
-
-        var clienten = _context.clienten.ToList();
-
-        var weekStart = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek + (int)DayOfWeek.Monday);
-        int offset = dag switch
+        [HttpGet]
+        public IActionResult GetStandaardDagindeling(int persid, string dag)
         {
-            "Maandag" => 0,
-            "Dinsdag" => 1,
-            "Woensdag" => 2,
-            "Donderdag" => 3,
-            "Vrijdag" => 4,
-            "Zaterdag" => 5,
-            "Zondag" => 6,
-            _ => 0
-        };
-        var dagDatum = weekStart.AddDays(offset);
-
-        ViewBag.Client = client;
-        ViewBag.Dag = dag;
-        ViewBag.Clienten = clienten;
-        ViewBag.DagDatum = dagDatum.ToString("yyyy-MM-dd");
-
-        var afgerondBids = _context.AfgerondeTaken
-            .Where(a => a.persid == id && a.dag == dag && a.plandatum == dagDatum)
-            .Select(a => a.bid)
-            .ToList();
-        ViewBag.AfgerondBids = afgerondBids;
-
-        return View(dagplanning);
-    }
-
-
-    public IActionResult Bewerken(int id, string dag)
-    {
-        var client = _context.clienten.FirstOrDefault(c => c.persid == id);
-        if (client == null) return NotFound();
-
-        var dagplanning = _context.Dagindelingen
-            .Where(dp => dp.clientId == id && dp.dagId == dag)
-            .OrderBy(dp => dp.volgorde)
-            .ToList();
-
-        ViewBag.Client = client;
-        ViewBag.Dag = dag;
-
-        return View(dagplanning);
-    }
-
-    [HttpPost]
-    public IActionResult SavePlanning(int persid, string dag, List<Dagindeling> taken)
-    {
-        foreach (var taak in taken)
-        {
-            var bestaande = _context.Dagindelingen.FirstOrDefault(d => d.Id == taak.Id);
-            if (bestaande != null)
-            {
-                bestaande.soort = taak.soort;
-                bestaande.volgorde = taak.volgorde;
-            }
+            var taken = _context.Dagindelingen
+                .Include(x => x.bakje)
+                .Where(x =>
+                    x.clientId == persid &&
+                    x.dagId == dag &&
+                    x.soort == "standaard")
+                .OrderBy(x => x.volgorde)
+                .Select(x => new
+                {
+                    id = x.bid,
+                    titel = x.bakje.Titel,
+                    kleur = x.bakje.Kleur.ToLower(),
+                    foto = x.bakje.Foto
+                })
+                .ToList();
+            return Json(taken);
         }
-
-        _context.SaveChanges();
-        return RedirectToAction("Bewerken", new { id = persid, dag = dag });
-    }
-
-    [HttpPost]
-    public IActionResult TaakAfvinken(int bid, int persid, string dag, string plandatum, int? sid, int? sid2)
-    {
-        DateTime planDt = DateTime.Parse(plandatum);
-        var bestaat = _context.AfgerondeTaken.FirstOrDefault(a =>
-            a.bid == bid &&
-            a.persid == persid &&
-            a.dag == dag &&
-            a.plandatum == planDt
-        );
-        if (bestaat == null)
-        {
-            var taak = new AfgerondeTaak
-            {
-                bid = bid,
-                persid = persid,
-                sid = sid,
-                sid2 = sid2,
-                dag = dag,
-                plandatum = planDt,
-                datum_afronden = DateTime.Now.Date,
-                tijd_afronden = DateTime.Now.TimeOfDay
-            };
-            _context.AfgerondeTaken.Add(taak);
-            _context.SaveChanges();
-        }
-        return Json(new { success = true });
-    }
-
-    [HttpPost]
-    public IActionResult TaakHeropenen(int bid, int persid, string dag, string plandatum)
-    {
-        DateTime planDt = DateTime.Parse(plandatum);
-        var bestaat = _context.AfgerondeTaken.FirstOrDefault(a =>
-            a.bid == bid &&
-            a.persid == persid &&
-            a.dag == dag &&
-            a.plandatum == planDt
-        );
-        if (bestaat != null)
-        {
-            _context.AfgerondeTaken.Remove(bestaat);
-            _context.SaveChanges();
-        }
-        return Json(new { success = true });
     }
 }

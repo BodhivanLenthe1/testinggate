@@ -24,9 +24,6 @@ namespace Zorgboerderij.Entities
         [Column("soort")]
         public string soort { get; set; }
 
-        [Column("datum")]
-        public DateTime datum { get; set; }
-
         [Column("volgorde")]
         public int volgorde { get; set; }
 
@@ -40,5 +37,8 @@ namespace Zorgboerderij.Entities
 
         [Column("sid2")]
         public int? sid2 { get; set; }
+
+        public DateTime? datum { get; set; }
+
     }
 }

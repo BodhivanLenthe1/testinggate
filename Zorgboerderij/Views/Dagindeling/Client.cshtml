@@ -67,7 +67,7 @@
         <input type="hidden" id="volgordeInput" name="nieuweVolgorde" />
         <input type="hidden" name="dag" value="@ViewBag.DebugDag" />
         <button type="submit" style="padding:10px 20px; background-color:#007bff; color:white; border:none; border-radius:5px; cursor:pointer;">
-            💾 Wijzigingen opslaan
+             Wijzigingen opslaan
         </button>
     </form>
     <div id="samenwerkingModal"
@@ -149,11 +149,11 @@
             "align-items": "center",
             "height": "150px",
             "width": "100%",
-            "padding": "0", 
-            "margin": "0", 
+            "padding": "0",
+            "margin": "0",
             "background": "none",
             "border": "none",
-            "border-radius": "0" 
+            "border-radius": "0"
         });
         $container.html(
             '<div style="text-align:center; font-size:16px; color:#555;">🧍‍♂️ Er is niemand aanwezig om mee samen te werken.</div>'
@@ -209,7 +209,7 @@
             if (geselecteerdePartners.length > 0) {
                 $currentSamenwerkTaak.data("samenwerkers", geselecteerdePartners);
                 $currentSamenwerkTaak.find(".partnerLabel").remove();
-                $currentSamenwerkTaak.append(`<div class="partnerLabel" style="margin-top:4px; font-size:11px; color:#333;">🤝 ${geselecteerdePartners.length} samenwerker(s)</div>`);
+                $currentSamenwerkTaak.append(`<div class="partnerLabel" style="margin-top:4px; font-size:11px; color:#333;"> ${geselecteerdePartners.length} samenwerker(s)</div>`);
             } else {
                 $currentSamenwerkTaak.removeData("samenwerkers");
                 $currentSamenwerkTaak.find(".partnerLabel").remove();
@@ -270,7 +270,7 @@
             $item.css("border", `2px solid ${kleur}`);
             $item.css("position", "relative");
 
-            const $samenwerkBtn = $('<button style="margin-top:6px; font-size:11px; background:#007bff; color:white; border:none; border-radius:4px; padding:3px 6px; cursor:pointer; width:100%;">➕ samenwerken</button>');
+            const $samenwerkBtn = $('<button style="margin-top:6px; font-size:11px; background:#007bff; color:white; border:none; border-radius:4px; padding:3px 6px; cursor:pointer; width:100%;"> samenwerken</button>');
             $samenwerkBtn.on("click", () => openSamenwerkingPopup($item));
 
             $item.append($samenwerkBtn);
@@ -319,11 +319,14 @@
     const bestaandePlanning = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
         Model.Dagindelingen.Select(d => new
         {
-            id = d.bid,
-            kleur = d.kleur.ToLower(),
-            titel = d.bakje?.Titel ?? "",
-            foto = Url.Content($"~/images/Bakjes/{d.kleur.ToLower()}/{d.bakje?.Foto}"),
-            samenwerkers = new[] { d.sid, d.sid2 }.Where(x => x.HasValue).Select(x => x.Value.ToString()).ToArray()
+                id = d.bid,
+                kleur = d.kleur.ToLower(),
+                titel = d.bakje?.Titel ?? "",
+                foto = Url.Content($"~/images/Bakjes/{d.kleur.ToLower()}/{d.bakje?.Foto}"),
+                samenwerkers = new[] { d.sid, d.sid2 }
+                            .Where(x => x.HasValue && x.Value > 0)
+                            .Select(x => x.Value.ToString())
+                            .ToArray()
         })
     ));
 
@@ -336,14 +339,25 @@
                  style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:4px;" />
         </div>
     `);
-        if (t.samenwerkers.length > 0) {
-            $taak.data("samenwerkers", t.samenwerkers);
-            $taak.append(`<div class="partnerLabel" style="margin-top:4px; font-size:11px; color:#333;">🤝 ${t.samenwerkers.length} samenwerker(s)</div>`);
-        }
+    const partners = (t.samenwerkers || [])
+      .filter(id => id !== "0" && id !== "");
+
+    const labelText = partners.length > 0
+      ? ` ${partners.length} samenwerker(s)`
+      : `geen samenwerker(s)`;
+
+    $taak
+      .data("samenwerkers", partners)
+      .append(`
+        <div class="partnerLabel"
+             style="min-height:1.2em; margin-top:4px; font-size:11px; color:#333;">
+          ${labelText}
+        </div>
+      `);
+
         $("#planningTimeline").append($taak);
         addExtras($taak);
     });
-
 
         $(document).on("dblclick", "#planningTimeline .photoItem", function () {
             $(this).remove();
@@ -383,7 +397,6 @@
         renderItems();
     };
 </script>
-
 
 
 

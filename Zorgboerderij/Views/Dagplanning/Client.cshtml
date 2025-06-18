@@ -16,12 +16,23 @@
 
     string GetAfbeeldingPath(string kleur, string foto)
         => $"/images/bakjes/{kleur?.ToLower()}/{foto}";
+
+    var kleurMap = new Dictionary<string, string>
+    {
+        {"rood",      "red"},
+        {"geel",      "yellow"},
+        {"groen",     "green"},
+        {"blauw",     "blue"},
+        {"paars",     "purple"},
+        {"oranje",    "orange"},
+        {"grijs",     "gray"},
+        {"zwart",     "black"},
+        {"bruin",     "saddlebrown"}
+    };
 }
 
 <div class="container mt-4" style="max-width:800px;">
-    <h3 style="color:black; font-weight:normal; margin-bottom:20px;">
-        @ViewData["Title"]
-    </h3>
+    <h3 style="margin-bottom:20px;">@ViewData["Title"]</h3>
 
     @if (!Model.Any())
     {
@@ -36,16 +47,20 @@
             {
                 var bakje = taak.bakje;
                 var imagePath = GetAfbeeldingPath(bakje?.Kleur, bakje?.Foto ?? "default.jpg");
+                var kleurKey = taak.kleur?.ToLower() ?? "";
+                var borderCol = kleurMap.ContainsKey(kleurKey)
+                ? kleurMap[kleurKey]
+                : "black";
 
                 <div style="
-             display:flex;
-             align-items:center;
-             justify-content:space-between;
-             border-left:2px solid black;
-             background-color:#f9f9f9;
-             padding:15px;
-             border-radius:6px;
-                   ">
+                    display:flex;
+                    align-items:center;
+                    justify-content:space-between;
+                    border-left:2px solid #ddd;
+                    background-color:#f9f9f9;
+                    padding:15px;
+                    border-radius:6px;
+                        ">
                     <div style="display:flex; align-items:center;">
                         <svg xmlns="http://www.w3.org/2000/svg"
                              viewBox="0 0 24 24"
@@ -56,26 +71,33 @@
                              data-plandatum="@dagDatum"
                              data-sid="@taak.sid"
                              data-sid2="@taak.sid2"
-                             style="stroke:@(afgerondBids.Contains(bakje?.bid ?? -1) ? "limegreen" : "gray");stroke-width:6px;fill:none;cursor:pointer;margin-right:15px;user-select:none;"
+                             style="
+                                stroke:@(afgerondBids.Contains(bakje?.bid ?? -1) ? "limegreen" : "gray");
+                                stroke-width:6px;
+                                fill:none;
+                                cursor:pointer;
+                                margin-right:15px;
+                                     "
                              onclick="toggleTaak(this)">
                             <polyline points="20 6 9 17 4 12" />
                         </svg>
-                        <img src="@Url.Content(imagePath)"
+
+                        <img class="task-photo"
+                             src="@Url.Content(imagePath)"
                              alt="@bakje?.Titel"
+                             data-full="@Url.Content(imagePath)"
                              style="
-                   width:80px;
-                   height:80px;
-                   object-fit:cover;
-                   margin-right:15px;
-                         " />
+                                width:80px;
+                                height:80px;
+                                object-fit:cover;
+                                margin-right:15px;
+                                border:4px solid @borderCol;
+                                border-radius:6px;
+                                cursor:pointer;
+                                     " />
 
                         <div>
-                            <h5 style="
-                      margin:0;
-                      font-size:1.2rem;
-                      color:black;
-                      font-weight:normal;
-                            ">
+                            <h5 style="margin:0; font-size:1.2rem; color:black;">
                                 @bakje?.Titel
                             </h5>
                         </div>
@@ -105,18 +127,14 @@
                                             <img src="@Url.Content($"~/images/clienten/{sw.FotoFile}")"
                                                  alt="@sw.Voornaam"
                                                  style="
-                                                        width:60px;
-                                                        height:60px;
-                                                        object-fit:cover;
-                                                        border-radius:50%;
-                                                        border:2px solid black;
-                                                        margin-bottom:5px;
-                                                   " />
-                                            <div style="
-                                                        font-size:0.9rem;
-                                                        color:black;
-                                                        font-weight:normal;
-                                                   ">
+                                                    width:60px;
+                                                    height:60px;
+                                                    object-fit:cover;
+                                                    border-radius:50%;
+                                                    border:2px solid @borderCol;
+                                                    margin-bottom:5px;
+                                                                         " />
+                                            <div style="font-size:0.9rem; color:black;">
                                                 @sw.Voornaam @sw.Achternaam
                                             </div>
                                         </div>
@@ -130,32 +148,68 @@
         </div>
     }
 </div>
+<div id="imageModal" style="
+     display:none;
+     position:fixed;
+     top:0; left:0;
+     width:100%; height:100%;
+     background:rgba(0,0,0,0.8);
+     justify-content:center;
+     align-items:center;
+     z-index:10000;
+">
+    <img id="modalImg" src="" alt="Grote foto" style="
+       width:40vw;
+       height:60vh;
+       object-fit:contain;
+       box-shadow:0 0 20px rgba(0,0,0,0.5);
+       border-radius:8px;
+       cursor:pointer;
+  ">
+</div>
+
 <script>
     function toggleTaak(el) {
-        var bid       = el.getAttribute('data-bid');
-        var persid    = el.getAttribute('data-persid');
-        var dag       = el.getAttribute('data-dag');
-        var plandatum = el.getAttribute('data-plandatum');
-        var sid       = el.getAttribute('data-sid');
-        var sid2      = el.getAttribute('data-sid2');
-        var afgerond  = el.style.stroke === 'limegreen';
+      var bid       = el.getAttribute('data-bid');
+      var persid    = el.getAttribute('data-persid');
+      var dag       = el.getAttribute('data-dag');
+      var plandatum = el.getAttribute('data-plandatum');
+      var sid       = el.getAttribute('data-sid');
+      var sid2      = el.getAttribute('data-sid2');
+      var afgerond  = el.style.stroke === 'limegreen';
 
-        el.style.stroke = afgerond ? 'gray' : 'limegreen';
+      el.style.stroke = afgerond ? 'gray' : 'limegreen';
 
-        if (afgerond) {
-            fetch('/Dagplanning/TaakHeropenen', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `bid=${encodeURIComponent(bid)}&persid=${encodeURIComponent(persid)}&dag=${encodeURIComponent(dag)}&plandatum=${encodeURIComponent(plandatum)}`
-            });
-        } else {
-            fetch('/Dagplanning/TaakAfvinken', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `bid=${encodeURIComponent(bid)}&persid=${encodeURIComponent(persid)}&dag=${encodeURIComponent(dag)}&plandatum=${encodeURIComponent(plandatum)}&sid=${encodeURIComponent(sid)}&sid2=${encodeURIComponent(sid2)}`
-            });
-        }
+      if (afgerond) {
+        fetch('/Dagplanning/TaakHeropenen', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `bid=${encodeURIComponent(bid)}&persid=${encodeURIComponent(persid)}&dag=${encodeURIComponent(dag)}&plandatum=${encodeURIComponent(plandatum)}`
+        });
+      } else {
+        fetch('/Dagplanning/TaakAfvinken', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `bid=${encodeURIComponent(bid)}&persid=${encodeURIComponent(persid)}&dag=${encodeURIComponent(dag)}&plandatum=${encodeURIComponent(plandatum)}&sid=${encodeURIComponent(sid)}&sid2=${encodeURIComponent(sid2)}`
+        });
+      }
     }
+
+    document.querySelectorAll('.task-photo').forEach(img => {
+      img.addEventListener('click', e => {
+        e.stopPropagation();
+        const src = img.getAttribute('data-full');
+        const modal = document.getElementById('imageModal');
+        document.getElementById('modalImg').src = src;
+        modal.style.display = 'flex';
+      });
+    });
+
+    document.getElementById('modalImg').addEventListener('click', e => {
+      e.stopPropagation();
+    });
+
+    document.getElementById('imageModal').addEventListener('click', () => {
+      document.getElementById('imageModal').style.display = 'none';
+    });
 </script>
-
-

@@ -3,6 +3,7 @@ using Zorgboerderij.Entities;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 
 public class DagindelingController : Controller
 {
@@ -56,57 +57,29 @@ public class DagindelingController : Controller
 
     public IActionResult Client(int id, string dag)
     {
-        var client = _context.clienten.FirstOrDefault(c => c.persid == id);
+        var client = _context.clienten.Find(id);
         if (client == null) return NotFound();
         if (string.IsNullOrEmpty(dag)) dag = GetNederlandseDagNaam(DateTime.Today.DayOfWeek);
-
         ViewBag.DebugDag = dag;
 
         var planning = _context.Dagindelingen
             .Include(d => d.bakje)
             .Include(d => d.client)
-            .Where(d => d.clientId == id && d.dagId == dag)
+            .Where(d =>
+                d.clientId == id &&
+                d.dagId == dag &&
+                d.soort == "standaard")
             .OrderBy(d => d.volgorde)
             .ToList();
-
-        var bakjes = _context.bakjes.ToList();
-        var alleClienten = _context.clienten.Where(c => EF.Property<string>(c, dag) != "X").ToList();
 
         var viewModel = new DagindelingViewModel
         {
             Client = client,
             Dagindelingen = planning,
-            Bakjes = bakjes,
-            AlleClienten = alleClienten
+            Bakjes = _context.bakjes.ToList(),
+            AlleClienten = _context.clienten.ToList()
         };
-
         return View("Client", viewModel);
-    }
-
-    public IActionResult ClientPlanning(int clientId, string dag)
-    {
-        var client = _context.clienten.FirstOrDefault(c => c.persid == clientId);
-        if (client == null) return NotFound();
-        if (string.IsNullOrEmpty(dag)) dag = GetNederlandseDagNaam(DateTime.Today.DayOfWeek);
-
-        ViewBag.DebugDag = dag;
-
-        var dagindeling = _context.Dagindelingen.Where(d => d.clientId == clientId).ToList();
-        var bakjes = _context.bakjes.ToList();
-        var personeel = _context.personeel.ToList();
-        var alleClienten = _context.clienten.Where(c => EF.Property<string>(c, dag) != "X").ToList();
-
-        var viewModel = new DagindelingViewModel
-        {
-            Client = client,
-            Dagindelingen = dagindeling,
-            Bakjes = bakjes,
-            Personeel = personeel,
-            Clienten = new System.Collections.Generic.List<Clienten> { client },
-            AlleClienten = alleClienten
-        };
-
-        return View(viewModel);
     }
 
     [HttpPost]
@@ -115,7 +88,6 @@ public class DagindelingController : Controller
         if (string.IsNullOrWhiteSpace(nieuweVolgorde) || string.IsNullOrWhiteSpace(dag))
             return BadRequest("Geen volgorde of dag ontvangen.");
 
-        var datum = DateTime.Today;
         var dagNaam = dag;
 
         var bestaande = _context.Dagindelingen
@@ -134,18 +106,21 @@ public class DagindelingController : Controller
                     .ToList()
             );
 
-        var bidLijst = nieuweVolgorde.Split(',')
+        var bidLijst = nieuweVolgorde
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
             .Select(s => int.TryParse(s, out var x) ? x : -1)
             .Where(x => x != -1)
             .ToList();
 
-        for (int volg = 0; volg < bidLijst.Count; volg++)
+        for (int i = 0; i < bidLijst.Count; i++)
         {
-            int bid = bidLijst[volg];
+            int bid = bidLijst[i];
             var bakje = _context.bakjes.FirstOrDefault(b => b.bid == bid);
             if (bakje == null) continue;
 
-            var samenwerkingKey = $"Samenwerkers[{bid}_{volg}]";
+            int volgorde = (i + 1) * 10;
+
+            var samenwerkingKey = $"Samenwerkers[{bid}_{i}]";
             var samenwerkerIds = samenwerkingDict.ContainsKey(samenwerkingKey)
                 ? samenwerkingDict[samenwerkingKey]
                 : new List<int>();
@@ -156,19 +131,16 @@ public class DagindelingController : Controller
                 bid = bid,
                 kleur = bakje.Kleur,
                 soort = "standaard",
-                volgorde = volg,
-                datum = datum,
+                volgorde = volgorde,
                 dagId = dagNaam,
-                sid = samenwerkerIds.Count > 0 ? samenwerkerIds[0] : null,
-                sid2 = samenwerkerIds.Count > 1 ? samenwerkerIds[1] : null
+                sid = samenwerkerIds.ElementAtOrDefault(0),
+                sid2 = samenwerkerIds.ElementAtOrDefault(1)
             };
 
             _context.Dagindelingen.Add(nieuwe);
         }
 
         _context.SaveChanges();
-
         return RedirectToAction("Client", new { id = clientId, dag = dagNaam });
     }
-
 }
