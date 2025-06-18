@@ -171,104 +171,24 @@ namespace Zorgboerderij.Controllers
                 .OrderBy(d => d.volgorde)
                 .ToList();
 
-            var model = new DagindelingViewModel
-            {
-                Client = client,
-                Dagindelingen = dagplanning,
-                Bakjes = _context.bakjes.ToList(),
-                AlleClienten = _context.clienten.ToList(),
-                Dag = dag
-            };
-            return View(model);
-        }
+        ViewBag.Client = client;
+        ViewBag.Dag = dag;
 
-        [HttpPost]
-        public IActionResult SavePlanning(
-            int clientId,
-            string dag,
-            string nieuweVolgorde,     
-            Dictionary<string, string> Samenwerkers)
+        return View(dagplanning);
+    }
+
+    [HttpPost]
+    public IActionResult SavePlanning(int persid, string dag, List<Dagindeling> taken)
+    {
+        foreach (var taak in taken)
         {
-            var weekStart = DateTime.Today
-                .AddDays(-(int)DateTime.Today.DayOfWeek + (int)DayOfWeek.Monday);
-            int offset = dag switch
+            var bestaande = _context.Dagindelingen.FirstOrDefault(d => d.Id == taak.Id);
+            if (bestaande != null)
             {
-                "Maandag" => 0,
-                "Dinsdag" => 1,
-                "Woensdag" => 2,
-                "Donderdag" => 3,
-                "Vrijdag" => 4,
-                "Zaterdag" => 5,
-                "Zondag" => 6,
-                _ => 0
-            };
-            var planDt = weekStart.AddDays(offset);
-
-            var toRemove = _context.Dagindelingen
-                .Where(d =>
-                    d.clientId == clientId &&
-                    d.soort == "eenmalig" &&
-                    d.dagId == dag &&
-                    d.datum == planDt);
-            _context.Dagindelingen.RemoveRange(toRemove);
-            _context.SaveChanges();
-
-            var standaard = _context.Dagindelingen
-                .Where(d =>
-                    d.clientId == clientId &&
-                    d.soort == "standaard" &&
-                    d.dagId == dag)
-                .OrderBy(d => d.volgorde)
-                .ToList();
-            var stdMap = standaard.ToDictionary(d => d.bid, d => d.volgorde);
-
-            var bids = (nieuweVolgorde ?? "")
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => int.TryParse(s, out var x) ? x : -1)
-                .Where(x => x != -1)
-                .ToList();
-
-            Samenwerkers ??= new();
-            int lastStdVolg = 0, tempCount = 0;
-            int stdIndex = 0;
-            var stdBids = standaard.Select(d => d.bid).ToList();
-
-            foreach (var bid in bids)
-            {
-                if (stdIndex < stdBids.Count && bid == stdBids[stdIndex])
-                {
-                    lastStdVolg = stdMap[bid];
-                    stdIndex++;
-                    tempCount = 0;
-                    continue;
-                }
-
-                tempCount++;
-                var volg = lastStdVolg + tempCount;
-
-                int idx = bids.IndexOf(bid);
-                Samenwerkers.TryGetValue($"{bid}_{idx}", out var swVal);
-                var swIds = (swVal ?? "")
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse)
-                    .ToArray();
-
-                var bakje = _context.bakjes.Find(bid);
-
-                var taak = new Dagindeling
-                {
-                    clientId = clientId,
-                    dagId = dag,
-                    datum = planDt,
-                    bid = bid,
-                    kleur = bakje?.Kleur ?? "",
-                    soort = "eenmalig",
-                    volgorde = volg,
-                    sid = swIds.ElementAtOrDefault(0),
-                    sid2 = swIds.ElementAtOrDefault(1)
-                };
-                _context.Dagindelingen.Add(taak);
+                bestaande.soort = taak.soort;
+                bestaande.volgorde = taak.volgorde;
             }
+        }
 
             _context.SaveChanges();
             return RedirectToAction("Bewerken", new { id = clientId, dag });

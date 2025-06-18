@@ -1,4 +1,3 @@
-﻿@model Zorgboerderij.Entities.DagindelingViewModel
 @{
     ViewData["Title"] = "Dagplanning";
     var client = Model.Client;
@@ -16,385 +15,84 @@
         {"grijs","gray"},{"zwart","black"},{"bruin","saddlebrown"}
     };
 }
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
-<div style="padding:20px;font-family:'Segoe UI',sans-serif;max-width:1400px;margin:auto;">
-    <h2 style="margin-bottom:20px;">Bewerken planning @client.Voornaam @client.Achternaam</h2>
-    <div style="display:flex;flex-wrap:wrap;gap:20px;">
-        <div style="flex:1;min-width:250px;max-width:300px;">
-            <div style="border:3px solid @client.Groepskleur.ToLower();border-radius:10px;
-                  padding:15px;display:flex;align-items:center;gap:15px;">
-                <img src="@Url.Content($"~/images/clienten/{client.FotoFile}")"
-                     style="width:90px;height:90px;border-radius:50%;object-fit:cover;
-                    box-shadow:0 0 6px rgba(0,0,0,0.1);" />
-                <div>
-                    <h3 style="margin:0 0 5px 0;">@client.Voornaam @client.Achternaam</h3>
-                    <div style="font-size:0.9em;color:#666;">ID: @client.persid</div>
-                </div>
+<div class="container my-4">
+    <h2>@ViewData["Title"]</h2>
+
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="mb-2">
+                <input id="searchInput" type="text" class="form-control" placeholder="Zoeken…">
             </div>
-        </div>
-        <div style="flex:3;min-width:400px;">
-            <div style="display:flex;flex-wrap:wrap;gap:15px;align-items:center;margin-bottom:15px;">
-                <input type="text" id="searchInput" placeholder="Zoeken op titel..."
-                       style="padding:8px 12px;border:1px solid #ccc;border-radius:6px;
-                      max-width:200px;flex:1;" />
-                <div style="display:flex;align-items:center;gap:5px;">
-                    <label for="kleurSort" style="font-weight:bold;">Kies activiteit:</label>
-                    <select id="kleurSort" style="padding:8px 12px;border-radius:6px;border:1px solid #ccc;">
-                        <option value="">Selecteer een activiteit</option>
-                        @foreach (var k in Model.Bakjes.Select(b => b.Kleur.ToLower()).Distinct().OrderBy(x => x))
-                        {
-                            var lbl = kleurOmschrijvingen.ContainsKey(k) ? kleurOmschrijvingen[k] : k;
-                            <option value="@k">@lbl</option>
-                        }
-                    </select>
-                </div>
+            <div class="mb-3">
+                <select id="kleurSort" class="form-select">
+                    <option value="">Alle activiteiten</option>
+                         <option value="rood">Creatief</option>
+                         <option value="groen">Tuin</option> -->
+                </select>
             </div>
             <div id="bakjes" class="connectedSortable"
-                 style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
-                  gap:10px;max-height:500px;overflow-y:auto;border:1px solid #ccc;
-                  padding:10px;border-radius:6px;background:#fafafa;">
+                 style="min-height:400px;border:1px solid #ccc;padding:10px;
+                        border-radius:6px;background:#fafafa;overflow-y:auto;">
+                <div class="photoItem mb-2 p-2 text-center" data-id="1" data-kleur="rood">
+                  <div class="fw-semibold text-truncate">Creatief</div>
+                  <img src="/images/placeholder.jpg" alt="Creatief" class="img-fluid rounded mt-1" style="aspect-ratio:1/1;object-fit:cover;">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div id="planningTimeline" class="connectedSortable d-flex flex-wrap gap-2 p-3"
+                 style="min-height:400px;border:2px dashed #aaa;
+                        border-radius:6px;background:#f9f9f9;overflow-x:auto;">
+                <div class="photoItem p-2 text-center" data-id="1" data-extra="0">
+                  <div class="fw-semibold text-truncate">Ochtendroutine</div>
+                  <img src="/images/placeholder.jpg" alt="Ochtendroutine" class="img-fluid rounded mt-1" style="aspect-ratio:1/1;object-fit:cover;">
+                </div>
+
             </div>
         </div>
     </div>
 
-    <div style="margin-top:30px;">
-        <h4 style="margin-bottom:10px;">Tijdlijn</h4>
-        <div id="planningTimeline" class="connectedSortable"
-             style="display:flex;flex-wrap:nowrap;gap:10px;overflow-x:auto;
-                border:2px dashed #aaa;padding:15px;min-height:220px;
-                border-radius:6px;background-color:#f9f9f9;">
-        </div>
-        <div style="text-align:center;margin-top:8px;font-size:0.85em;color:#888;">
-            Ochtend &mdash; Middag
-        </div>
-    </div>
-
-    <form method="post" asp-action="SavePlanning" style="margin-top:25px;">
-        <input type="hidden" name="clientId" value="@client.persid" />
+    <form id="saveForm" asp-action="SavePlanning" method="post" class="mt-4">
         <input type="hidden" id="volgordeInput" name="nieuweVolgorde" />
-        <input type="hidden" name="dag" value="@Model.Dag" />
-        <button type="submit"
-                style="padding:10px 20px;background-color:#007bff;color:white;
-                   border:none;border-radius:5px;cursor:pointer;">
-            Wijzigingen opslaan
-        </button>
+        <button type="submit" class="btn btn-success">💾 Opslaan</button>
     </form>
 </div>
 
-<div id="samenwerkingModal" style="display:none;position:fixed;top:0;left:0;
-     width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;">
-    <div style="display:flex;justify-content:center;align-items:center;height:100%;">
-        <div style="background:white;padding:25px;border-radius:12px;max-width:500px;
-                width:90%;box-shadow:0 10px 30px rgba(0,0,0,0.3);text-align:center;">
-            <h3 style="margin-top:0;font-size:20px;">Samenwerken toevoegen</h3>
-            <p style="margin-bottom:15px;font-size:14px;color:#444;">
-                Klik op maximaal <strong>2 cliënten</strong> om deze taak samen te doen:
-            </p>
-            <div id="partnerVisualContainer"
-                 style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
-                  gap:12px;margin-bottom:20px;max-height:300px;overflow-y:auto;">
-            </div>
-            <div style="display:flex;justify-content:flex-end;gap:10px;">
-                <button id="closeSamenwerking"
-                        style="padding:8px 16px;background:#eee;border:none;border-radius:6px;
-                       font-size:14px;cursor:pointer;">
-                    ❌ Annuleren
-                </button>
-                <button id="confirmSamenwerking"
-                        style="padding:8px 16px;background:#28a745;color:white;border:none;
-                       border-radius:6px;font-size:14px;cursor:pointer;">
-                    ✅ Bevestigen
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="popupMessage" style="display:none;position:fixed;top:30px;left:50%;
-     transform:translateX(-50%);background:#dc3545;color:white;padding:10px 20px;
-     border-radius:8px;font-weight:bold;z-index:10001;box-shadow:0 4px 12px rgba(0,0,0,0.25);">
-</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<script>
-    const partners = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-      Model.AlleClienten.Select(c => new
-      {
-          id = c.persid,
-          naam = c.Voornaam + " " + c.Achternaam,
-          foto = Url.Content($"~/images/clienten/{c.FotoFile}")
-      })
-    ));
-    const kleurMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(kleurMap));
-
-    let bakjesData = [];
-
-    function showPopup(msg) {
-      $("#popupMessage").text(msg).fadeIn(200);
-      setTimeout(()=>$("#popupMessage").fadeOut(400),3000);
-    }
-
-    function openSamenwerkingPopup($taak) {
-      window.$currentTaak = $taak;
-      const sel = $taak.data("samenwerkers")||[];
-      let geselecteerde = [...sel];
-      const huidig = parseInt($("input[name='clientId']").val(),10);
-      const $c = $("#partnerVisualContainer").empty();
-      const others = partners.filter(p=>p.id!==huidig);
-      if (!others.length) {
-        $c.css({"display":"flex","justify-content":"center","align-items":"center"})
-          .text("🧍‍♂️ Er is niemand aanwezig om mee samen te werken.");
-      } else {
-        $c.css({"display":"grid","grid-template-columns":"repeat(auto-fill,minmax(100px,1fr))"});
-        others.forEach(p=>{
-          const isSel = geselecteerde.includes(p.id.toString());
-          const $card = $(`<div data-id="${p.id}"
-              style="border:2px solid ${isSel?'#28a745':'transparent'};
-                     border-radius:10px;padding:10px;cursor:pointer;text-align:center;">
-              <img src="${p.foto}" style="width:60px;height:60px;border-radius:50%;margin-bottom:5px;" />
-              <div style="font-size:13px;">${p.naam}</div>
-            </div>`);
-          $card.on("click", ()=>{
-            const sid = p.id.toString();
-            if (geselecteerde.includes(sid)) {
-              geselecteerde = geselecteerde.filter(x=>x!==sid);
-            } else if (geselecteerde.length<2) {
-              geselecteerde.push(sid);
-            } else {
-              showPopup("Maximaal 2 cliënten selecteren.");
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script>
+        $(function() {
+            function renderBakjes() {
+                const sel = $('#kleurSort').val();
+                const q   = $('#searchInput').val().toLowerCase();
+                $('#bakjes .photoItem').each(function() {
+                    const $it    = $(this);
+                    const kleur  = $it.data('kleur');
+                    const title  = $it.find('.fw-semibold').text().toLowerCase();
+                    $it.toggle((!sel || kleur === sel) && title.includes(q));
+                });
             }
-            $card.css("border-color", geselecteerde.includes(sid)?"#28a745":"transparent");
-          });
-          $c.append($card);
+            $('#kleurSort, #searchInput').on('change keyup', renderBakjes);
+
+            $('.connectedSortable').sortable({
+                connectWith: '.connectedSortable',
+                placeholder: 'sortable-placeholder',
+                forcePlaceholderSize: true,
+                helper: 'clone'
+            }).disableSelection();
+
+            $('#saveForm').on('submit', function() {
+                const volg = [];
+                $('#planningTimeline .photoItem').each(function() {
+                    const id      = $(this).data('id');
+                    const isExtra = $(this).data('extra') ? 1 : 0;
+                    volg.push(`${id}:${isExtra}`);
+                });
+                $('#volgordeInput').val(volg.join(','));
+            });
         });
-      }
-      $("#samenwerkingModal").fadeIn(200);
-      $("#confirmSamenwerking").off("click").on("click", ()=>{
-        window.$currentTaak
-          .data("samenwerkers", geselecteerde)
-          .find(".partnerLabel").remove()
-          .end()
-          .append(`<div class="partnerLabel"
-                       style="min-height:1.2em;margin-top:4px;font-size:11px;color:#333;">
-                     ${geselecteerde.length>0
-                       ? ` ${geselecteerde.length} samenwerker(s)`
-                       : `geen samenwerker(s)`}
-                   </div>`);
-        $("#samenwerkingModal").fadeOut(200);
-      });
-    }
-    $("#closeSamenwerking").on("click",()=>$("#samenwerkingModal").fadeOut(200));
-
-    function addExtras($item) {
-      if ($item.find('button').length === 0) {
-        $item.append($(`<button style="
-            margin-top:6px;font-size:11px;background:#007bff;color:white;
-            border:none;border-radius:4px;padding:3px 6px;cursor:pointer;width:100%;">
-            + Samenwerken
-          </button>`).on("click",()=>openSamenwerkingPopup($item)));
-      }
-    }
-
-    function createTaskElement(taskData, soort = 'eenmalig') {
-      const $taak = $(`
-        <div class="photoItem"
-             data-id="${taskData.id}"
-             data-kleur="${taskData.kleur}"
-             data-soort="${soort}"
-             style="
-               cursor:move;
-               min-height:1.2em;
-               border:2px solid ${kleurMap[taskData.kleur]||"#ccc"};
-               padding:4px;
-               font-size:0.8em;
-               text-align:center;
-               background:white;
-               border-radius:5px;
-               min-width:130px;
-               max-width:130px;
-               transition:transform .12s ease,box-shadow .12s ease;
-             ">
-          <div style="margin-bottom:4px;white-space:nowrap;overflow:hidden;
-                      text-overflow:ellipsis;">${taskData.titel}</div>
-          <img src="${taskData.foto}" alt="${taskData.titel}"
-               style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:4px;" />
-          <div class="partnerLabel"
-               style="min-height:1.2em;margin-top:4px;font-size:11px;color:#333;">
-            geen samenwerker(s)
-          </div>
-        </div>
-      `);
-
-      addExtras($taak);
-
-      return $taak;
-    }
-
-    function initSortable(){
-      if ($("#bakjes").hasClass('ui-sortable')) {
-        $("#bakjes").sortable("destroy");
-      }
-      if ($("#planningTimeline").hasClass('ui-sortable')) {
-        $("#planningTimeline").sortable("destroy");
-      }
-
-      $("#bakjes").sortable({
-        connectWith: "#planningTimeline",
-        helper: "clone",
-        receive(e, ui) {
-          if (ui.sender.attr("id") === "planningTimeline" && ui.item.data("soort") === "standaard") {
-            ui.sender.sortable("cancel");
-            showPopup("Standaard taken kun je niet uit de planning halen.");
-          }
-        }
-      }).disableSelection();
-
-      $("#planningTimeline").sortable({
-        connectWith: "#bakjes",
-        placeholder: "sortable-placeholder",
-        forcePlaceholderSize: true,
-        scroll: false,
-        helper: (e, ui) => ui.clone().css({ width: ui.width(), opacity: 0.9 }),
-        cancel: ".photoItem[data-soort='standaard']",
-        receive: function (event, ui) {
-          if (ui.sender && ui.sender.attr("id") === "bakjes") {
-            const id = ui.item.data("id");
-            const bakje = bakjesData.find(b => b.id === id);
-
-            if (!bakje) {
-              console.error("Bakje niet gevonden voor id:", id);
-              return;
-            }
-
-            const $newItem = createTaskElement(bakje, 'eenmalig');
-
-            ui.item.replaceWith($newItem);
-          }
-        }
-      }).disableSelection();
-    }
-
-    window.onload = function(){
-      bakjesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-        Model.Bakjes.Select(b => new
-        {
-            id = b.bid,
-            kleur = b.Kleur.ToLower(),
-            titel = b.Titel,
-            foto = Url.Content($"~/images/Bakjes/{b.Kleur.ToLower()}/{b.Foto}")
-        })
-      ));
-
-      const bestaandePlanning = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-        Model.Dagindelingen.Select(d => new
-        {
-            id = d.bid,
-            kleur = d.kleur.ToLower(),
-            titel = d.bakje?.Titel ?? "",
-            foto = Url.Content($"~/images/Bakjes/{d.kleur.ToLower()}/{d.bakje?.Foto}"),
-            soort = d.soort,
-            samenwerkers = new[] { d.sid, d.sid2 }
-                          .Where(x => x.HasValue && x.Value > 0)
-                          .Select(x => x.Value.ToString())
-                          .ToArray()
-        })
-      ));
-
-      renderBakjes();
-      initSortable();
-
-      bestaandePlanning.forEach(t=>{
-        const $taak = createTaskElement(t, t.soort);
-
-        const partnersArr = (t.samenwerkers||[])
-          .filter(id=>id!=="0"&&id!=="");
-        const labelText = partnersArr.length>0
-          ? ` ${partnersArr.length} samenwerker(s)`
-          : `geen samenwerker(s)`;
-
-        $taak
-          .data("samenwerkers", partnersArr)
-          .find(".partnerLabel")
-          .text(labelText);
-
-        $("#planningTimeline").append($taak);
-      });
-
-      $(document).on("dblclick","#planningTimeline .photoItem",function(){
-        const soort = $(this).data("soort");
-        console.log("Dubbel-klik op item met soort:", soort); // Debug log
-
-        if(soort === "eenmalig"){
-          $(this).remove();
-        } else {
-          showPopup("Standaard taken kun je niet verwijderen.");
-        }
-      });
-
-      $(document).on("dblclick", "#bakjes .photoItem", function () {
-        const id = $(this).data("id");
-        const bakje = bakjesData.find(b => b.id === id);
-
-        if (bakje) {
-          const $newItem = createTaskElement(bakje, 'eenmalig');
-          $("#planningTimeline").append($newItem);
-        }
-      });
-
-      $("#kleurSort,#searchInput").on("change keyup", renderBakjes);
-
-      $("form").on("submit",function(){
-        const ids = $("#planningTimeline .photoItem")
-                      .map((i,e)=>$(e).data("id")).get();
-        $("#volgordeInput").val(ids.join(","));
-        $("input[name^='Samenwerkers']").remove();
-        $("#planningTimeline .photoItem").each(function(idx){
-          const id=$(this).data("id"),
-                p=$(this).data("samenwerkers")||[];
-          if(p.length){
-            $("<input>").attr({
-              type:"hidden",
-              name:`Samenwerkers[${id}_${idx}]`,
-              value:p.join(",")
-            }).appendTo("form");
-          }
-        });
-      });
-
-      function renderBakjes(){
-        const cf=$("#kleurSort").val(),
-              q=$("#searchInput").val().toLowerCase();
-        $("#bakjes").empty();
-        bakjesData
-          .filter(b=>(!cf||b.kleur===cf)&&b.titel.toLowerCase().includes(q))
-          .forEach(b=>{
-            const $i = $(`
-              <div class="photoItem"
-                   data-id="${b.id}"
-                   data-kleur="${b.kleur}"
-                   style="
-                     cursor:move;
-                     min-height:1.2em;
-                     border:2px solid ${kleurMap[b.kleur]||"#ccc"};
-                     padding:4px;
-                     font-size:0.8em;
-                     text-align:center;
-                     background:white;
-                     border-radius:5px;
-                     min-width:130px;
-                     max-width:130px;
-                   ">
-                <div style="margin-bottom:4px;white-space:nowrap;overflow:hidden;
-                            text-overflow:ellipsis;">${b.titel}</div>
-                <img src="${b.foto}" style="width:100%;aspect-ratio:1/1;
-                                           object-fit:cover;border-radius:4px;" />
-              </div>
-            `);
-            $("#bakjes").append($i);
-          });
-
-        initSortable();
-      }
-    };
-</script>
+    </script>
+}
